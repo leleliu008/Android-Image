@@ -357,9 +357,7 @@ public class SuperImageView extends AppCompatImageView {
 
 
     /**
-     * <b>get the scaled display image Matrix Rect to calculate the zoom ratio<b/><br/>
-     *
-     * @return
+     * get the scaled display image Matrix Rect to calculate the zoom ratio.
      */
     public RectF getMatrixRect() {
         Matrix matrix = this.matrix;

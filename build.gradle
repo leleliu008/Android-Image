@@ -59,6 +59,7 @@ retrolambda {//指定将源码编译的级别，使用下列代码，会将代�
 
 dependencies {
     compile fileTree(dir: 'src/main/libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.fpliu:Android-BaseUI:1.0.0'
     compile 'com.fpliu:Android-CustomDimen:1.0.0'
     compile 'com.fpliu:Android-List:1.0.0'
