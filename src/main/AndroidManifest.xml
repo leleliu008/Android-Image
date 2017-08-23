@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.fpliu.newton.ui.image">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application>
+        <activity
+            android:name="com.fpliu.newton.ui.image.activity.CropActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.fpliu.newton.ui.image.activity.ImagePreviewActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.fpliu.newton.ui.image.activity.ImagesGridActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.fpliu.newton.ui.image.activity.FilePreviewActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="com.fpliu.newton.ui.image.activity.UriPreviewActivity"
+            android:launchMode="singleTop" />
+    </application>
+</manifest>

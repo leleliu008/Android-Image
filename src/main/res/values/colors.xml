@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="theme_body">#cc22292c</color>
+    <color name="theme_body_dark">#cc20272a</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="aip_main">#fc22292c</color>
+</resources>
