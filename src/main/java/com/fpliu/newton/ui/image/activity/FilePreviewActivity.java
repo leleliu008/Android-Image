@@ -86,6 +86,6 @@ public final class FilePreviewActivity extends BaseActivity {
             }
         });
         viewPager.setCurrentItem(position, true);
-        addContentView(viewPager);
+        addViewInBody(viewPager);
     }
 }

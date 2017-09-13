@@ -95,6 +95,6 @@ public final class UriPreviewActivity extends BaseActivity {
             }
         });
         viewPager.setCurrentItem(position, true);
-        addContentView(viewPager);
+        addViewInBody(viewPager);
     }
 }

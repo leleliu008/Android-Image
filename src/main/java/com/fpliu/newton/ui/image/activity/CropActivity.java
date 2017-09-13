@@ -40,7 +40,7 @@ public class CropActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addContentView(R.layout.activity_crop);
+        addViewInBody(R.layout.activity_crop);
 
         setTitle("裁剪");
 
