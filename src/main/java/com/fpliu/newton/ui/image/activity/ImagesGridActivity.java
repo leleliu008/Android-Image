@@ -166,7 +166,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
                     imageItems.add(null);
                     setItems(imageItems);
                 } else {
-                    pullableViewContainer.finishRequestWithRefresh(pullType, true, "没有图片", "没有图片");
+                    pullableViewContainer.finishRequest(pullType, true, "没有图片");
                 }
             } else {
                 androidImagePicker.setImageSets(imageSetList);
