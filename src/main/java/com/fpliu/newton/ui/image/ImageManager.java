@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.fpliu.newton.ui.image.activity.FilePreviewActivity;
+import com.fpliu.newton.ui.image.activity.ImageItemPreviewActivity;
 import com.fpliu.newton.ui.image.activity.ImagesGridActivity;
 import com.fpliu.newton.ui.image.activity.UriPreviewActivity;
 import com.fpliu.newton.ui.image.bean.ImageItem;
@@ -190,6 +191,10 @@ public final class ImageManager {
         UriPreviewActivity.start(activity, initPosition, images);
     }
 
+    public static void startImageItemPreview(Activity activity, int initPosition, ArrayList<ImageItem> images) {
+        ImageItemPreviewActivity.start(activity, initPosition, images);
+    }
+
     public static void startFilePreview(Activity activity, int initPosition, File imageFile) {
         ArrayList<File> images = new ArrayList<>();
         images.add(imageFile);
@@ -202,6 +207,11 @@ public final class ImageManager {
         UriPreviewActivity.start(activity, initPosition, images);
     }
 
+    public static void startImageItemPreview(Activity activity, int initPosition, ImageItem imageItem) {
+        ArrayList<ImageItem> images = new ArrayList<>();
+        images.add(imageItem);
+        ImageItemPreviewActivity.start(activity, initPosition, images);
+    }
 
     /**
      * Listeners of image selected changes,if you want to custom the Activity of ImagesGrid or ImagePreview,you might use it.
