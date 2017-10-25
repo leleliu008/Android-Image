@@ -63,6 +63,8 @@ public class ImagePickLayout extends RecyclerView {
 
     private ItemAdapter<ImageItem, ItemViewHolder> itemAdapter;
 
+    private OnImagesChangedListener onImagesChangedListener;
+
     public ImagePickLayout(Context context) {
         super(context);
         init(context);
@@ -116,6 +118,9 @@ public class ImagePickLayout extends RecyclerView {
                             if (size() < maxSelectCount) {
                                 add(null);
                             }
+                            if (onImagesChangedListener != null) {
+                                onImagesChangedListener.onImagesChanged(getItems());
+                            }
                         }).pick((Activity) context);
                     } else {
                         ArrayList<ImageItem> items = (ArrayList<ImageItem>) getItems();
@@ -130,6 +135,9 @@ public class ImagePickLayout extends RecyclerView {
                     } else {
                         remove(position);
                         add(null);
+                    }
+                    if (onImagesChangedListener != null) {
+                        onImagesChangedListener.onImagesChanged(getItems());
                     }
                 }
             }
@@ -166,5 +174,13 @@ public class ImagePickLayout extends RecyclerView {
 
     public List<ImageItem> getItems() {
         return itemAdapter.getItems();
+    }
+
+    public void setOnImagesChangedListener(OnImagesChangedListener onImagesChangedListener) {
+        this.onImagesChangedListener = onImagesChangedListener;
+    }
+
+    public interface OnImagesChangedListener {
+        void onImagesChanged(List<ImageItem> currentImageItems);
     }
 }
