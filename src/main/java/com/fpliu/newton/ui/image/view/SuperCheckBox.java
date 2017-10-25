@@ -41,16 +41,4 @@ public class SuperCheckBox extends CompoundButton {
             super.toggle();
         }
     }
-
-    @Override
-    public boolean performClick() {
-        final boolean handled = super.performClick();
-        if (!handled) {
-            // View only makes a sound effect if the onClickListener was
-            // called, so we'll need to make one here instead.
-            playSoundEffect(SoundEffectConstants.CLICK);
-        }
-
-        return handled;
-    }
 }

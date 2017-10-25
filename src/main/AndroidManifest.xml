@@ -7,23 +7,27 @@
 
     <application>
         <activity
-            android:name="com.fpliu.newton.ui.image.activity.CropActivity"
+            android:name=".crop.CropActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.fpliu.newton.ui.image.activity.ImagePreviewActivity"
+            android:name=".picker.ImagePreviewActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.fpliu.newton.ui.image.activity.ImagesGridActivity"
+            android:name=".picker.ImagesGridActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.fpliu.newton.ui.image.activity.FilePreviewActivity"
+            android:name=".preview.FilePreviewActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name="com.fpliu.newton.ui.image.activity.UriPreviewActivity"
+            android:name=".preview.UriPreviewActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".preview.ImageItemPreviewActivity"
             android:launchMode="singleTop" />
     </application>
 </manifest>

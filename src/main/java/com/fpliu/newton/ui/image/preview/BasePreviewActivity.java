@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image.activity;
+package com.fpliu.newton.ui.image.preview;
 
 
 import android.os.Bundle;
@@ -7,13 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fpliu.newton.ui.base.BaseActivity;
-import com.fpliu.newton.ui.image.ImageManager;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.ViewPagerAdapter;
-import com.fpliu.newton.ui.image.view.TouchImageView;
 import com.fpliu.newton.ui.list.ViewHolder;
 
-import java.io.File;
 import java.util.ArrayList;
 
 abstract class BasePreviewActivity<T> extends BaseActivity {
@@ -61,10 +58,9 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
         viewPager.setAdapter(new ViewPagerAdapter<T>(images) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                ViewHolder viewHolder = ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent);
-                TouchImageView imageView = viewHolder.id(R.id.preview_view_item_image_view).getView();
-                ImageManager.getImageLoader().onLoad(imageView, getUri(position, getItem(position)), R.drawable.btn_back_normal);
-                return viewHolder.getItemView();
+                return ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent)
+                        .id(R.id.preview_view_item_image_view).image(getUri(position, getItem(position)), R.drawable.btn_back_normal)
+                        .getItemView();
             }
         });
         viewPager.setCurrentItem(position, true);

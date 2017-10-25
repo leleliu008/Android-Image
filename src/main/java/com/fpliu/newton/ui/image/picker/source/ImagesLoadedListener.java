@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image;
+package com.fpliu.newton.ui.image.picker.source;
 
 import com.fpliu.newton.ui.image.bean.ImageSet;
 

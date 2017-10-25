@@ -1,23 +1,23 @@
-package com.fpliu.newton.ui.image;
+package com.fpliu.newton.ui.image.picker;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.fpliu.newton.ui.image.activity.FilePreviewActivity;
-import com.fpliu.newton.ui.image.activity.ImageItemPreviewActivity;
-import com.fpliu.newton.ui.image.activity.ImagesGridActivity;
-import com.fpliu.newton.ui.image.activity.UriPreviewActivity;
 import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.bean.ImageSet;
+import com.fpliu.newton.ui.image.crop.CropCompleteListener;
+import com.fpliu.newton.ui.image.loader.DefaultImageLoader;
+import com.fpliu.newton.ui.image.loader.ImageLoader;
+import com.fpliu.newton.ui.image.picker.source.DataSource;
+import com.fpliu.newton.ui.image.picker.source.LocalDataSource;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public final class ImageManager {
+public final class ImagePicker {
 
     public static final String KEY_PIC_PATH = "key_pic_path";
 
@@ -35,7 +35,7 @@ public final class ImageManager {
     static final int SELECT_MODE_MULTI = 1;
 
 
-    private static final String TAG = ImageManager.class.getSimpleName();
+    private static final String TAG = ImagePicker.class.getSimpleName();
 
     /**
      * 是否显示拍照的按钮
@@ -80,13 +80,13 @@ public final class ImageManager {
 
     private static ImageLoader imageLoader = new DefaultImageLoader();
 
-    private static ImageManager mInstance;
+    private static ImagePicker mInstance;
 
-    public static ImageManager getInstance() {
+    public static ImagePicker getInstance() {
         if (mInstance == null) {
-            synchronized (ImageManager.class) {
+            synchronized (ImagePicker.class) {
                 if (mInstance == null) {
-                    mInstance = new ImageManager();
+                    mInstance = new ImagePicker();
                 }
             }
         }
@@ -94,14 +94,14 @@ public final class ImageManager {
     }
 
     public static void setImageLoader(ImageLoader imageLoader) {
-        ImageManager.imageLoader = imageLoader;
+        ImagePicker.imageLoader = imageLoader;
     }
 
     public static ImageLoader getImageLoader() {
         return imageLoader;
     }
 
-    public ImageManager maxSelectCount(int maxSelectCount) {
+    public ImagePicker maxSelectCount(int maxSelectCount) {
         this.maxSelectCount = maxSelectCount;
         return this;
     }
@@ -110,16 +110,21 @@ public final class ImageManager {
         return maxSelectCount;
     }
 
+    ImagePicker selectMode(int selectMode) {
+        this.selectMode = selectMode;
+        return this;
+    }
+
     public boolean isSingleMode() {
         return selectMode == SELECT_MODE_SINGLE;
     }
 
-    public ImageManager singleMode() {
+    public ImagePicker singleMode() {
         selectMode = SELECT_MODE_SINGLE;
         return this;
     }
 
-    public ImageManager multiMode() {
+    public ImagePicker multiMode() {
         selectMode = SELECT_MODE_MULTI;
         return this;
     }
@@ -128,7 +133,7 @@ public final class ImageManager {
         return selectMode == SELECT_MODE_MULTI;
     }
 
-    public ImageManager needShowCamera(boolean needShowCamera) {
+    public ImagePicker needShowCamera(boolean needShowCamera) {
         this.needShowCamera = needShowCamera;
         return this;
     }
@@ -137,7 +142,7 @@ public final class ImageManager {
         return needShowCamera;
     }
 
-    public ImageManager needCrop(boolean needCrop) {
+    public ImagePicker needCrop(boolean needCrop) {
         this.needCrop = needCrop;
         return this;
     }
@@ -146,7 +151,7 @@ public final class ImageManager {
         return needCrop;
     }
 
-    public ImageManager cropWidth(int cropWidth) {
+    public ImagePicker cropWidth(int cropWidth) {
         this.cropWidth = cropWidth;
         return this;
     }
@@ -155,7 +160,7 @@ public final class ImageManager {
         return cropWidth;
     }
 
-    public ImageManager cropHeight(int cropHeight) {
+    public ImagePicker cropHeight(int cropHeight) {
         this.cropHeight = cropHeight;
         return this;
     }
@@ -164,7 +169,7 @@ public final class ImageManager {
         return cropHeight;
     }
 
-    public ImageManager dataSource(DataSource dataSource) {
+    public ImagePicker dataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         return this;
     }
@@ -173,44 +178,14 @@ public final class ImageManager {
         return dataSource;
     }
 
-    public ImageManager onImagePickComplete(ImagePickCompleteListener listener) {
+    public ImagePicker onImagePickComplete(ImagePickCompleteListener listener) {
         this.onImagePickCompleteListener = listener;
         return this;
     }
 
-    public ImageManager pick(Activity activity) {
+    public ImagePicker pick(Activity activity) {
         activity.startActivity(new Intent(activity, ImagesGridActivity.class));
         return this;
-    }
-
-    public static void startFilePreview(Activity activity, int initPosition, ArrayList<File> images) {
-        FilePreviewActivity.start(activity, initPosition, images);
-    }
-
-    public static void startUriPreview(Activity activity, int initPosition, ArrayList<String> images) {
-        UriPreviewActivity.start(activity, initPosition, images);
-    }
-
-    public static void startImageItemPreview(Activity activity, int initPosition, ArrayList<ImageItem> images) {
-        ImageItemPreviewActivity.start(activity, initPosition, images);
-    }
-
-    public static void startFilePreview(Activity activity, int initPosition, File imageFile) {
-        ArrayList<File> images = new ArrayList<>();
-        images.add(imageFile);
-        FilePreviewActivity.start(activity, initPosition, images);
-    }
-
-    public static void startUriPreview(Activity activity, int initPosition, String imageFilePath) {
-        ArrayList<String> images = new ArrayList<>();
-        images.add(imageFilePath);
-        UriPreviewActivity.start(activity, initPosition, images);
-    }
-
-    public static void startImageItemPreview(Activity activity, int initPosition, ImageItem imageItem) {
-        ArrayList<ImageItem> images = new ArrayList<>();
-        images.add(imageItem);
-        ImageItemPreviewActivity.start(activity, initPosition, images);
     }
 
     /**
@@ -246,16 +221,16 @@ public final class ImageManager {
         }
     }
 
-    private List<ImageCropCompleteListener> mImageCropCompleteListeners;
+    private List<CropCompleteListener> mImageCropCompleteListeners;
 
-    public void addOnImageCropCompleteListener(ImageCropCompleteListener listener) {
+    public void addOnImageCropCompleteListener(CropCompleteListener listener) {
         if (mImageCropCompleteListeners == null) {
             mImageCropCompleteListeners = new ArrayList<>();
         }
         mImageCropCompleteListeners.add(listener);
     }
 
-    public void removeOnImageCropCompleteListener(ImageCropCompleteListener listener) {
+    public void removeOnImageCropCompleteListener(CropCompleteListener listener) {
         if (mImageCropCompleteListeners != null) {
             mImageCropCompleteListeners.remove(listener);
         }
@@ -263,7 +238,7 @@ public final class ImageManager {
 
     public void notifyImageCropComplete(Bitmap bmp, int ratio) {
         if (mImageCropCompleteListeners != null) {
-            for (ImageCropCompleteListener listener : mImageCropCompleteListeners) {
+            for (CropCompleteListener listener : mImageCropCompleteListeners) {
                 if (listener != null) {
                     listener.onImageCropComplete(bmp, ratio);
                 }

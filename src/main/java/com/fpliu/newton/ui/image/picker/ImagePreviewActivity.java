@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image.activity;
+package com.fpliu.newton.ui.image.picker;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,8 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fpliu.newton.log.Logger;
-import com.fpliu.newton.ui.image.ImageManager;
-import com.fpliu.newton.ui.image.ImageSelectedChangeListener;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.ViewPagerAdapter;
 import com.fpliu.newton.ui.image.bean.ImageItem;
@@ -30,7 +28,7 @@ public class ImagePreviewActivity extends FragmentActivity
 
     private static final String TAG = ImagePreviewActivity.class.getSimpleName();
 
-    private ImageManager androidImagePicker;
+    private ImagePicker androidImagePicker;
     private TextView mTitleCount;
     private CheckBox mCbSelected;
     private TextView mBtnOk;
@@ -41,32 +39,32 @@ public class ImagePreviewActivity extends FragmentActivity
 
     public static void startForResult(Activity parent, int requestCode, int setPosition, int picPosition) {
         Intent intent = new Intent(parent, ImagePreviewActivity.class);
-        intent.putExtra(ImageManager.KEY_SET_SELECTED_POSITION, setPosition);
-        intent.putExtra(ImageManager.KEY_PIC_SELECTED_POSITION, picPosition);
+        intent.putExtra(ImagePicker.KEY_SET_SELECTED_POSITION, setPosition);
+        intent.putExtra(ImagePicker.KEY_PIC_SELECTED_POSITION, picPosition);
         parent.startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(ImageManager.KEY_SET_SELECTED_POSITION, setPosition);
-        outState.putInt(ImageManager.KEY_PIC_SELECTED_POSITION, picPosition);
+        outState.putInt(ImagePicker.KEY_SET_SELECTED_POSITION, setPosition);
+        outState.putInt(ImagePicker.KEY_PIC_SELECTED_POSITION, picPosition);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            setPosition = getIntent().getIntExtra(ImageManager.KEY_SET_SELECTED_POSITION, 0);
-            picPosition = getIntent().getIntExtra(ImageManager.KEY_PIC_SELECTED_POSITION, 0);
+            setPosition = getIntent().getIntExtra(ImagePicker.KEY_SET_SELECTED_POSITION, 0);
+            picPosition = getIntent().getIntExtra(ImagePicker.KEY_PIC_SELECTED_POSITION, 0);
         } else {
-            setPosition = savedInstanceState.getInt(ImageManager.KEY_SET_SELECTED_POSITION, 0);
-            picPosition = savedInstanceState.getInt(ImageManager.KEY_PIC_SELECTED_POSITION, 0);
+            setPosition = savedInstanceState.getInt(ImagePicker.KEY_SET_SELECTED_POSITION, 0);
+            picPosition = savedInstanceState.getInt(ImagePicker.KEY_PIC_SELECTED_POSITION, 0);
         }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_pre);
 
-        androidImagePicker = ImageManager.getInstance();
+        androidImagePicker = ImagePicker.getInstance();
         androidImagePicker.addOnImageSelectedChangeListener(this);
 
         mBtnOk = (TextView) findViewById(R.id.btn_ok);
@@ -105,7 +103,7 @@ public class ImagePreviewActivity extends FragmentActivity
                 imageView.setLayoutParams(params);
                 imageView.setOnDoubleTapListener(ImagePreviewActivity.this);
 
-                ImageManager.getImageLoader().onLoad(imageView, Uri.fromFile(new File(getItem(position).path)).toString(), R.drawable.default_img);
+                ImagePicker.getImageLoader().displayImage(imageView, Uri.fromFile(new File(getItem(position).path)).toString(), R.drawable.default_img);
 
                 return imageView;
             }
@@ -203,11 +201,11 @@ public class ImagePreviewActivity extends FragmentActivity
         boolean isSelect = androidImagePicker.isSelect(picPosition, item);
         if (isCheck) {
             if (!isSelect) {
-                ImageManager.getInstance().addSelectedImageItem(picPosition, item);
+                ImagePicker.getInstance().addSelectedImageItem(picPosition, item);
             }
         } else {
             if (isSelect) {
-                ImageManager.getInstance().deleteSelectedImageItem(picPosition, item);
+                ImagePicker.getInstance().deleteSelectedImageItem(picPosition, item);
             }
         }
     }

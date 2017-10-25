@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image.activity;
+package com.fpliu.newton.ui.image.picker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,41 +8,42 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.fpliu.newton.log.Logger;
 import com.fpliu.newton.ui.base.TextBtn;
 import com.fpliu.newton.ui.base.UIUtil;
-import com.fpliu.newton.ui.image.ImageManager;
-import com.fpliu.newton.ui.image.ImageSelectedChangeListener;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.Util;
 import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.bean.ImageSet;
+import com.fpliu.newton.ui.image.crop.CropActivity;
 import com.fpliu.newton.ui.list.ItemAdapter;
-import com.fpliu.newton.ui.list.PullableGridActivity;
+import com.fpliu.newton.ui.list.PullableRecyclerViewActivity;
 import com.fpliu.newton.ui.list.ViewHolder;
 import com.fpliu.newton.ui.pullable.PullType;
 import com.fpliu.newton.ui.pullable.PullableViewContainer;
+import com.fpliu.newton.ui.recyclerview.ItemViewHolder;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImagesGridActivity extends PullableGridActivity<ImageItem>
+public class ImagesGridActivity extends PullableRecyclerViewActivity<ImageItem, ItemViewHolder>
         implements ImageSelectedChangeListener, CompoundButton.OnCheckedChangeListener {
+
+    private static final String TAG = "ImagesGridActivity";
 
     private static final String KEY_FILE_PATH = "imagePath";
 
@@ -50,7 +51,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
 
     private static final int REQUEST_CODE_PREVIEW = 1001;
 
-    private ImageManager androidImagePicker;
+    private ImagePicker androidImagePicker;
 
     private Button completeBtn;
 
@@ -75,7 +76,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        androidImagePicker = ImageManager.getInstance();
+        androidImagePicker = ImagePicker.getInstance();
         if (savedInstanceState != null) {
             imagePath = savedInstanceState.getString(KEY_FILE_PATH);
         }
@@ -105,7 +106,8 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
                     });
         }
 
-        setNumColumns(4);
+        asGrid(4);
+        clearItemDecorations();
         canPullDown(false);
         canPullUp(false);
 
@@ -113,51 +115,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
     }
 
     @Override
-    protected void onDestroy() {
-        androidImagePicker.removeOnImageItemSelectedChangeListener(this);
-        androidImagePicker.clearImageSets();
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        //从预览界面返回
-        if (requestCode == REQUEST_CODE_PREVIEW) {
-            if (resultCode == Activity.RESULT_OK) {
-                setResult(RESULT_OK);
-                finish();
-                androidImagePicker.notifyOnImagePickComplete();
-            }
-        }
-        //从拍照返回
-        else if (requestCode == REQUEST_CODE_CAMERA) {
-            if (resultCode == Activity.RESULT_OK) {
-                if (!TextUtils.isEmpty(imagePath)) {
-                    Util.galleryAddPic(me(), imagePath);
-
-                    finish();
-
-                    //需要进行裁剪
-                    if (androidImagePicker.needCrop()) {
-                        Intent intent = new Intent();
-                        intent.setClass(me(), CropActivity.class);
-                        intent.putExtra(ImageManager.KEY_PIC_PATH, imagePath);
-                        startActivityForResult(intent, REQUEST_CODE_CAMERA);
-                    } else {
-                        ImageItem item = new ImageItem(imagePath, "", -1);
-                        androidImagePicker.clearSelectedImages();
-                        androidImagePicker.addSelectedImageItem(-1, item);
-                        androidImagePicker.notifyOnImagePickComplete();
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onRefreshOrLoadMore(PullableViewContainer<GridView> pullableViewContainer, PullType pullType, int pageNumber, int pageSize) {
+    public void onRefreshOrLoadMore(PullableViewContainer<RecyclerView> pullableViewContainer, PullType pullType, int pageNumber, int pageSize) {
         androidImagePicker.dataSource().loadData(me(), imageSetList -> {
             //说明没有图片
             if (imageSetList == null) {
@@ -192,6 +150,50 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        androidImagePicker.removeOnImageItemSelectedChangeListener(this);
+        androidImagePicker.clearImageSets();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //从预览界面返回
+        if (requestCode == REQUEST_CODE_PREVIEW) {
+            if (resultCode == Activity.RESULT_OK) {
+                setResult(RESULT_OK);
+                finish();
+                androidImagePicker.notifyOnImagePickComplete();
+            }
+        }
+        //从拍照返回
+        else if (requestCode == REQUEST_CODE_CAMERA) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (!TextUtils.isEmpty(imagePath)) {
+                    Util.galleryAddPic(me(), imagePath);
+
+                    finish();
+
+                    //需要进行裁剪
+                    if (androidImagePicker.needCrop()) {
+                        Intent intent = new Intent();
+                        intent.setClass(me(), CropActivity.class);
+                        intent.putExtra(ImagePicker.KEY_PIC_PATH, imagePath);
+                        startActivityForResult(intent, REQUEST_CODE_CAMERA);
+                    } else {
+                        ImageItem item = new ImageItem(imagePath, "", -1);
+                        androidImagePicker.clearSelectedImages();
+                        androidImagePicker.addSelectedImageItem(-1, item);
+                        androidImagePicker.notifyOnImagePickComplete();
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * 创建弹出的ListView
      */
@@ -222,7 +224,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
             public View getView(int position, View convertView, ViewGroup parent) {
                 ImageSet item = getItem(position);
                 ViewHolder viewHolder = ViewHolder.getInstance(R.layout.list_item_folder, convertView, parent);
-                ImageManager.getImageLoader().onLoad(viewHolder.id(R.id.cover).getImageView(), Uri.fromFile(new File(item.cover.path)).toString(), R.drawable.default_img);
+                ImagePicker.getImageLoader().displayImage(viewHolder.id(R.id.cover).getImageView(), Uri.fromFile(new File(item.cover.path)).toString(), R.drawable.default_img);
                 viewHolder.id(R.id.name).text(item.name);
                 viewHolder.id(R.id.size).text(item.imageItems.size() + me().getResources().getString(R.string.piece));
                 viewHolder.id(R.id.indicator).visibility(selectedImageSetIndex == position ? View.VISIBLE : View.INVISIBLE);
@@ -251,17 +253,11 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
         });
     }
 
-
     // 设置屏幕透明度
     private void backgroundAlpha(float bgAlpha) {
         WindowManager.LayoutParams lp = me().getWindow().getAttributes();
         lp.alpha = bgAlpha; // 0.0~1.0
         me().getWindow().setAttributes(lp);
-    }
-
-    @Override
-    public int getItemViewTypeCount() {
-        return androidImagePicker.needShowCamera() ? 2 : 1;
     }
 
     private static final int ITEM_TYPE_CAMERA = 0;
@@ -273,27 +269,31 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
     }
 
     @Override
-    public View getItemView(int position, View convertView, ViewGroup parent) {
-        int viewType = getItemViewType(position);
-        if (viewType == ITEM_TYPE_CAMERA) {
-            return ViewHolder.getInstance(R.layout.grid_item_camera, convertView, parent).getItemView();
+    public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
+        if (position == 0) {
+            return ItemViewHolder.newInstance(R.layout.grid_item_camera, viewGroup);
         } else {
-            ImageItem item = getItem(position);
-            ViewHolder viewHolder = ViewHolder.getInstance(R.layout.image_grid_item, convertView, parent);
-
-            boolean isSelected = androidImagePicker.isSelect(position, item);
-
-            ImageView imageView = viewHolder.id(R.id.iv_thumb).selected(isSelected).getImageView();
-            ImageManager.getImageLoader().onLoad(imageView, Uri.fromFile(new File(item.path)).toString(), R.drawable.default_img);
-
-            viewHolder.id(R.id.iv_thumb_check).tag(R.id.iv_thumb_check, position).checked(isSelected).checkedChange(this).visibility(androidImagePicker.isMultiMode() ? View.VISIBLE : View.GONE);
-            return viewHolder.getItemView();
+            return ItemViewHolder.newInstance(R.layout.image_grid_item, viewGroup);
         }
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        super.onItemClick(parent, view, position, id);
+    public void onBindViewHolder(ItemViewHolder holder, int position, ImageItem imageItem) {
+        int viewType = getItemViewType(position);
+        if (viewType == ITEM_TYPE_CAMERA) {
+
+        } else {
+            boolean isSelected = androidImagePicker.isSelect(position, imageItem);
+            holder.id(R.id.iv_thumb).selected(isSelected).image(Uri.fromFile(new File(imageItem.path)).toString(), R.drawable.default_img);
+            holder.id(R.id.iv_thumb_check).tagWithCurrentId(position).checked(isSelected).checkedChange(this).visibility(androidImagePicker.isMultiMode() ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    @Override
+    public void onItemClick(ItemViewHolder holder, int position, ImageItem item) {
+        Logger.i(TAG, "onItemClick() position = " + position);
+
+        super.onItemClick(holder, position, item);
 
         if (getItemViewType(position) == ITEM_TYPE_CAMERA) {
             File file = Util.takePicture(me(), REQUEST_CODE_CAMERA);
@@ -308,7 +308,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
                 //如果需要裁剪，就调用裁剪程序
                 if (androidImagePicker.needCrop()) {
                     Intent intent = new Intent(ImagesGridActivity.this, CropActivity.class);
-                    intent.putExtra(ImageManager.KEY_PIC_PATH, getItem(position).path);
+                    intent.putExtra(ImagePicker.KEY_PIC_PATH, getItem(position).path);
                     startActivity(intent);
                 } else {
                     androidImagePicker.clearSelectedImages();
@@ -325,6 +325,7 @@ public class ImagesGridActivity extends PullableGridActivity<ImageItem>
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        Logger.i(TAG, "onCheckedChanged() isChecked = " + isChecked);
         int position = (int) buttonView.getTag(R.id.iv_thumb_check);
         ImageItem item = getItem(position);
         if (isChecked) {

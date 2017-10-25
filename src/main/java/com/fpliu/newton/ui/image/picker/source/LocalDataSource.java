@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image;
+package com.fpliu.newton.ui.image.picker.source;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +10,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 import com.fpliu.newton.log.Logger;
+import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.bean.ImageSet;
 

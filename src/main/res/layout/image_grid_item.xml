@@ -1,6 +1,6 @@
 <com.fpliu.newton.ui.image.view.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:padding="@dimen/dp750_3">
 
     <ImageView
@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:button="@null"
+            android:clickable="true"
             android:drawablePadding="0dp"
             android:drawableRight="@drawable/sel_media_item_checked"
             android:paddingBottom="16dp"

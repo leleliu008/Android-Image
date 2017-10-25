@@ -1,4 +1,4 @@
-package com.fpliu.newton.ui.image.activity;
+package com.fpliu.newton.ui.image.preview;
 
 import android.app.Activity;
 import android.content.Intent;
