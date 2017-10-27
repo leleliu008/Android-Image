@@ -9,5 +9,7 @@
         android:id="@+id/preview_view_item_image_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:clickable="true"
         android:scaleType="fitCenter" />
 </LinearLayout>

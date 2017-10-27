@@ -7,12 +7,14 @@ import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.fpliu.newton.ui.base.BaseActivity;
+import com.fpliu.newton.ui.base.UIUtil;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.ViewPagerAdapter;
+import com.fpliu.newton.ui.image.view.TouchImageView;
 import com.fpliu.newton.ui.list.ViewHolder;
 
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
     private ArrayList<T> images;
 
     private TextView textView;
+
+    private int screenHeight;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -49,6 +53,8 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
             images = (ArrayList<T>) savedInstanceState.getSerializable(KEY_IMAGES);
         }
 
+        screenHeight = UIUtil.getScreenHeight(this);
+
         ViewPager viewPager = new ViewPager(this);
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
@@ -61,20 +67,22 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
         viewPager.setAdapter(new ViewPagerAdapter<T>(images) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                return ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent)
-                        .id(R.id.preview_view_item_image_view)
+                ViewHolder viewHolder = ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent);
+                TouchImageView touchImageView = viewHolder.id(R.id.preview_view_item_image_view)
                         .image(getUri(position, getItem(position)), R.drawable.btn_back_normal)
                         .tagWithCurrentId("TouchImageView")
                         .clicked(BasePreviewActivity.this)
-                        .getItemView();
+                        .getView();
+                touchImageView.setMaxHeight(screenHeight);
+                return viewHolder.getItemView();
             }
         });
         viewPager.setCurrentItem(position, true);
         setContentView(viewPager);
 
-        int bottom = (int) getResources().getDimension(R.dimen.dp750_30);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bottom);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.BOTTOM;
+        lp.bottomMargin = (int) getResources().getDimension(R.dimen.dp750_30);
 
         textView = new TextView(this);
         textView.setTextSize(20);
