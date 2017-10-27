@@ -107,8 +107,13 @@ public class ImagePickLayout extends RecyclerView {
 
             @Override
             public void onBindViewHolder(ItemViewHolder holder, int position, ImageItem imageItem) {
-                holder.id(R.id.image_selected_layout_delete).tagWithCurrentId(position).clicked(this).image(deleteThumbnailRes);
-                holder.id(R.id.image_selected_layout_image).tagWithCurrentId(position).clicked(this).scaleType(thumbnailScaleType);
+                holder.id(R.id.image_selected_layout_delete)
+                        .tagWithCurrentId(position).clicked(this)
+                        .image(deleteThumbnailRes)
+                        .visibility(imageItem == null ? GONE : VISIBLE);
+                holder.id(R.id.image_selected_layout_image)
+                        .tagWithCurrentId(position).clicked(this).
+                        scaleType(thumbnailScaleType);
                 if (imageItem == null) {
                     holder.image(addThumbnailRes);
                 } else {

@@ -17,7 +17,7 @@ import com.fpliu.newton.ui.list.ViewHolder;
 
 import java.util.ArrayList;
 
-abstract class BasePreviewActivity<T> extends BaseActivity {
+abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnClickListener {
 
     static final String KEY_POSITION = "position";
 
@@ -62,7 +62,10 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 return ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent)
-                        .id(R.id.preview_view_item_image_view).image(getUri(position, getItem(position)), R.drawable.btn_back_normal)
+                        .id(R.id.preview_view_item_image_view)
+                        .image(getUri(position, getItem(position)), R.drawable.btn_back_normal)
+                        .tagWithCurrentId("TouchImageView")
+                        .clicked(BasePreviewActivity.this)
                         .getItemView();
             }
         });
@@ -77,9 +80,22 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
         textView.setTextSize(20);
         textView.setTextColor(Color.WHITE);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
-        addContentView(textView);
+        addContentView(textView, lp);
 
         updatePosition();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Object tag = v.getTag();
+        if (tag != null) {
+            if (tag instanceof String) {
+                String tagStr = (String) tag;
+                if ("TouchImageView".equals(tagStr)) {
+                    finish();
+                }
+            }
+        }
     }
 
     private void updatePosition() {
