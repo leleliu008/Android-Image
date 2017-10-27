@@ -21,7 +21,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|top"
-            android:padding="@dimen/dp750_20"
             android:scaleType="centerInside"
             android:src="@drawable/ic_delete_image" />
     </FrameLayout>

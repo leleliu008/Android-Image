@@ -70,9 +70,9 @@ public class ImagePickLayout extends RecyclerView {
 
     private ImageView.ScaleType thumbnailScaleType = ImageView.ScaleType.CENTER_CROP;
 
-    private IconShape thumbnailShape = IconShape.ORIGIN;
+    private ThumbnailShape thumbnailShape = ThumbnailShape.ORIGIN;
 
-    public enum IconShape {
+    public enum ThumbnailShape {
         ORIGIN,
         CIRCLE,
         ROUND_RECT
@@ -221,7 +221,7 @@ public class ImagePickLayout extends RecyclerView {
         this.thumbnailScaleType = thumbnailScaleType;
     }
 
-    public void setThumbnailShape(IconShape thumbnailShape) {
+    public void setThumbnailShape(ThumbnailShape thumbnailShape) {
         this.thumbnailShape = thumbnailShape;
     }
 

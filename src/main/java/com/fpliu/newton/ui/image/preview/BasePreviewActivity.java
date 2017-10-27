@@ -1,10 +1,14 @@
 package com.fpliu.newton.ui.image.preview;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.fpliu.newton.ui.base.BaseActivity;
 import com.fpliu.newton.ui.image.R;
@@ -22,6 +26,8 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
     private int position;
 
     private ArrayList<T> images;
+
+    private TextView textView;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -43,16 +49,13 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
             images = (ArrayList<T>) savedInstanceState.getSerializable(KEY_IMAGES);
         }
 
-        setTitle((position + 1) + "/" + images.size());
-
         ViewPager viewPager = new ViewPager(this);
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
                 BasePreviewActivity.this.position = position;
-                int size = images.size();
-                setTitle((position % size + 1) + "/" + size);
+                updatePosition();
             }
         });
         viewPager.setAdapter(new ViewPagerAdapter<T>(images) {
@@ -64,7 +67,25 @@ abstract class BasePreviewActivity<T> extends BaseActivity {
             }
         });
         viewPager.setCurrentItem(position, true);
-        addViewInBody(viewPager);
+        setContentView(viewPager);
+
+        int bottom = (int) getResources().getDimension(R.dimen.dp750_30);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, bottom);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+        textView = new TextView(this);
+        textView.setTextSize(20);
+        textView.setTextColor(Color.WHITE);
+        textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        addContentView(textView);
+
+        updatePosition();
+    }
+
+    private void updatePosition() {
+        if (textView != null) {
+            textView.setText((position + 1) + "/" + images.size());
+        }
     }
 
     protected final ArrayList<T> images() {
