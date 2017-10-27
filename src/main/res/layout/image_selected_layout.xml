@@ -6,14 +6,14 @@
     android:gravity="center">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="@dimen/dp750_200"
-        android:layout_height="@dimen/dp750_200">
+        android:layout_width="@dimen/dp750_190"
+        android:layout_height="@dimen/dp750_190">
 
         <ImageView
             android:id="@+id/image_selected_layout_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/dp750_10"
+            android:layout_margin="@dimen/dp750_30"
             android:scaleType="centerCrop" />
 
         <ImageView
@@ -21,8 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|top"
-            android:padding="@dimen/dp750_10"
+            android:padding="@dimen/dp750_20"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_clear" />
+            android:src="@drawable/ic_delete_image" />
     </FrameLayout>
 </LinearLayout>

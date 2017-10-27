@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.bean.ImageItem;
@@ -61,6 +62,24 @@ public class ImagePickLayout extends RecyclerView {
      */
     private int maxSelectCount = 9;
 
+    private int addThumbnailRes = R.drawable.ic_add_pic;
+
+    private int deleteThumbnailRes = R.drawable.ic_delete_image;
+
+    private int defaultThumbnailRes = R.drawable.default_img;
+
+    private ImageView.ScaleType thumbnailScaleType = ImageView.ScaleType.CENTER_CROP;
+
+    private IconShape thumbnailShape = IconShape.ORIGIN;
+
+    public enum IconShape {
+        ORIGIN,
+        CIRCLE,
+        ROUND_RECT
+    }
+
+    private int radius = 8;
+
     private ItemAdapter<ImageItem, ItemViewHolder> itemAdapter;
 
     private OnImagesChangedListener onImagesChangedListener;
@@ -88,12 +107,22 @@ public class ImagePickLayout extends RecyclerView {
 
             @Override
             public void onBindViewHolder(ItemViewHolder holder, int position, ImageItem imageItem) {
-                holder.id(R.id.image_selected_layout_delete).tagWithCurrentId(position).clicked(this);
-                holder.id(R.id.image_selected_layout_image).tagWithCurrentId(position).clicked(this);
+                holder.id(R.id.image_selected_layout_delete).tagWithCurrentId(position).clicked(this).image(deleteThumbnailRes);
+                holder.id(R.id.image_selected_layout_image).tagWithCurrentId(position).clicked(this).scaleType(thumbnailScaleType);
                 if (imageItem == null) {
-                    holder.image(R.drawable.ic_add_pic);
+                    holder.image(addThumbnailRes);
                 } else {
-                    holder.image(imageItem.path, R.drawable.default_img);
+                    switch (thumbnailShape) {
+                        case ORIGIN:
+                            holder.image(imageItem.path, defaultThumbnailRes);
+                            break;
+                        case CIRCLE:
+                            holder.imageCircle(imageItem.path, defaultThumbnailRes);
+                            break;
+                        case ROUND_RECT:
+                            holder.imageRound(imageItem.path, defaultThumbnailRes, radius);
+                            break;
+                    }
                 }
             }
 
@@ -174,6 +203,30 @@ public class ImagePickLayout extends RecyclerView {
 
     public List<ImageItem> getItems() {
         return itemAdapter.getItems();
+    }
+
+    public void setAddThumbnailRes(int addThumbnailRes) {
+        this.addThumbnailRes = addThumbnailRes;
+    }
+
+    public void setDeleteThumbnailRes(int deleteThumbnailRes) {
+        this.deleteThumbnailRes = deleteThumbnailRes;
+    }
+
+    public void setDefaultThumbnailRes(int defaultThumbnailRes) {
+        this.defaultThumbnailRes = defaultThumbnailRes;
+    }
+
+    public void setThumbnailScaleType(ImageView.ScaleType thumbnailScaleType) {
+        this.thumbnailScaleType = thumbnailScaleType;
+    }
+
+    public void setThumbnailShape(IconShape thumbnailShape) {
+        this.thumbnailShape = thumbnailShape;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 
     public void setOnImagesChangedListener(OnImagesChangedListener onImagesChangedListener) {
