@@ -8,8 +8,8 @@
     <com.fpliu.newton.ui.image.view.TouchImageView
         android:id="@+id/preview_view_item_image_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:clickable="true"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitXY" />
 </LinearLayout>

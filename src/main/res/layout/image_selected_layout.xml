@@ -5,7 +5,7 @@
     android:padding="@dimen/dp750_20"
     android:gravity="center">
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
         android:layout_width="@dimen/dp750_190"
         android:layout_height="@dimen/dp750_190">
 

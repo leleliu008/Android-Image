@@ -69,7 +69,7 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
             public View getView(int position, View convertView, ViewGroup parent) {
                 ViewHolder viewHolder = ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent);
                 TouchImageView touchImageView = viewHolder.id(R.id.preview_view_item_image_view)
-                        .image(getUri(position, getItem(position)), R.drawable.btn_back_normal)
+                        .image(getUri(position, getItem(position)), R.drawable.shape_black_bg)
                         .tagWithCurrentId("TouchImageView")
                         .clicked(BasePreviewActivity.this)
                         .getView();
