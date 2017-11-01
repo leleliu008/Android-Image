@@ -262,7 +262,9 @@ public final class ImagePicker {
 
     void notifyImagePickComplete() {
         if (imagePickCompleteListener != null) {
-            imagePickCompleteListener.onImagePickComplete(pickedImages());
+            List<ImageItem> list = new ArrayList<>();
+            list.addAll(pickedImages());
+            imagePickCompleteListener.onImagePickComplete(list);
             reset();
         }
     }

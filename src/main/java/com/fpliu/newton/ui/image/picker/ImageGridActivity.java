@@ -130,15 +130,13 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                     return completeBtn;
                 }
             }).getRightBtnClickObservable().compose(bindToLifecycle()).subscribe(o -> {
-                finish();
                 imagePicker.notifyImagePickComplete();
+                finish();
             });
 
             click(previewBtn).subscribe(view -> ImagePreviewActivity.startForResult(me(), REQUEST_CODE_PREVIEW, -1, 0));
 
-            boolean enabled = imagePicker.pickedImageCount() > 0;
-            completeBtn.setEnabled(enabled);
-            previewBtn.setEnabled(enabled);
+            updateStatus();
         } else {
             previewBtn.setVisibility(View.GONE);
         }
@@ -346,32 +344,31 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
             int pickedImageCount = imagePicker.pickedImageCount();
             if (pickedImageCount < imagePicker.maxSelectCount()) {
                 imagePicker.addInPickedCache(item);
-
-                buttonView.setText(String.valueOf(pickedImageCount + 1));
-
-                previewBtn.setEnabled(true);
-                previewBtn.setText("预览(" + imagePicker.pickedImageCount() + ")");
-
-                completeBtn.setEnabled(true);
-                completeBtn.setText("完成(" + imagePicker.pickedImageCount() + ")");
+                updateStatus();
             } else {
                 String text = getResources().getString(R.string.you_have_a_select_limit, imagePicker.maxSelectCount());
                 showToast(text);
             }
         } else {
             imagePicker.deleteFromPickedCache(item);
-            if (imagePicker.pickedImageCount() == 0) {
-                buttonView.setText("");
+            updateStatus();
+        }
+    }
 
-                previewBtn.setText("预览");
-                previewBtn.setEnabled(false);
+    private void updateStatus() {
+        int pickedImageCount = imagePicker.pickedImageCount();
+        if (pickedImageCount == 0) {
+            previewBtn.setEnabled(false);
+            previewBtn.setText("预览");
 
-                completeBtn.setEnabled(false);
-                completeBtn.setText("完成");
-            } else {
-                previewBtn.setText("预览(" + imagePicker.pickedImageCount() + ")");
-                completeBtn.setText("完成(" + imagePicker.pickedImageCount() + ")");
-            }
+            completeBtn.setEnabled(false);
+            completeBtn.setText("完成");
+        } else {
+            previewBtn.setEnabled(true);
+            previewBtn.setText("预览(" + pickedImageCount + ")");
+
+            completeBtn.setEnabled(true);
+            completeBtn.setText("完成(" + pickedImageCount + "/" + imagePicker.maxSelectCount() + ")");
         }
     }
 }

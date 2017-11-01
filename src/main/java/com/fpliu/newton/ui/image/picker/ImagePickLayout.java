@@ -102,32 +102,28 @@ public class ImagePickLayout extends RecyclerView {
 
             @Override
             public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-                return ItemViewHolder.newInstance(R.layout.image_selected_layout, viewGroup);
+                return ItemViewHolder
+                        .newInstance(R.layout.image_selected_layout, viewGroup)
+                        .id(R.id.image_selected_layout_delete)
+                        .clicked(this)
+                        .image(deleteThumbnailRes)
+                        .id(R.id.image_selected_layout_image)
+                        .clicked(this)
+                        .scaleType(thumbnailScaleType);
             }
 
             @Override
             public void onBindViewHolder(ItemViewHolder holder, int position, ImageItem imageItem) {
-                holder.id(R.id.image_selected_layout_delete)
-                        .tagWithCurrentId(position).clicked(this)
-                        .image(deleteThumbnailRes)
-                        .visibility(imageItem == null ? GONE : VISIBLE);
-                holder.id(R.id.image_selected_layout_image)
-                        .tagWithCurrentId(position).clicked(this).
-                        scaleType(thumbnailScaleType);
+                holder.id(R.id.image_selected_layout_delete).tagWithCurrentId(position).visibility(imageItem == null ? GONE : VISIBLE);
+                holder.id(R.id.image_selected_layout_image).tagWithCurrentId(position);
                 if (imageItem == null) {
                     holder.image(addThumbnailRes);
-                } else {
-                    switch (thumbnailShape) {
-                        case ORIGIN:
-                            holder.image(imageItem.path, defaultThumbnailRes);
-                            break;
-                        case CIRCLE:
-                            holder.imageCircle(imageItem.path, defaultThumbnailRes);
-                            break;
-                        case ROUND_RECT:
-                            holder.imageRound(imageItem.path, defaultThumbnailRes, radius);
-                            break;
-                    }
+                } else if (thumbnailShape == ThumbnailShape.ORIGIN) {
+                    holder.image(imageItem.path, defaultThumbnailRes);
+                } else if (thumbnailShape == ThumbnailShape.CIRCLE) {
+                    holder.imageCircle(imageItem.path, defaultThumbnailRes);
+                } else if (thumbnailShape == ThumbnailShape.ROUND_RECT) {
+                    holder.imageRound(imageItem.path, defaultThumbnailRes, radius);
                 }
             }
 
@@ -136,31 +132,37 @@ public class ImagePickLayout extends RecyclerView {
                 super.onClick(view);
                 int id = view.getId();
                 if (id == R.id.image_selected_layout_image) {
-                    int position = (Integer) view.getTag(R.id.image_selected_layout_image);
-                    ImageItem imageItem = getItem(position);
+                    ArrayList<ImageItem> items = (ArrayList<ImageItem>) getItems();
+                    items = (ArrayList<ImageItem>) items.clone();
+                    int lastIndex = items.size() - 1;
+                    if (items.get(lastIndex) == null) {
+                        items.remove(lastIndex);
+                    }
+
+                    int clickedPosition = (Integer) view.getTag(R.id.image_selected_layout_image);
+                    ImageItem clickedImageItem = getItem(clickedPosition);
                     //如果是添加图片按钮
-                    if (imageItem == null) {
-                        ImagePicker.getInstance().needShowCamera(needShowCamera).needCrop(needCrop).cropWidth(cropWidth).cropHeight(cropHeight).selectMode(selectMode).maxSelectCount(maxSelectCount).imagePickCompleteListener(items -> {
-                            removeLastItem();
-                            for (ImageItem image : items) {
-                                if (size() < maxSelectCount) {
-                                    add(image);
-                                } else {
-                                    break;
-                                }
-                            }
-                            if (size() < maxSelectCount) {
-                                add(null);
-                            }
-                            if (onImagesChangedListener != null) {
-                                onImagesChangedListener.onImagesChanged(getItems());
-                            }
-                        }).pick((Activity) context);
+                    if (clickedImageItem == null) {
+                        ImagePicker.getInstance()
+                                .needShowCamera(needShowCamera)
+                                .needCrop(needCrop)
+                                .cropWidth(cropWidth)
+                                .cropHeight(cropHeight)
+                                .selectMode(selectMode)
+                                .maxSelectCount(maxSelectCount)
+                                .pickedImages(items)
+                                .imagePickCompleteListener(pickedItems -> {
+                                    if (pickedItems.size() < maxSelectCount) {
+                                        pickedItems.add(null);
+                                    }
+                                    setItems(pickedItems);
+                                    if (onImagesChangedListener != null) {
+                                        onImagesChangedListener.onImagesChanged(getItems());
+                                    }
+                                })
+                                .pick((Activity) context);
                     } else {
-                        ArrayList<ImageItem> items = (ArrayList<ImageItem>) getItems();
-                        items = (ArrayList<ImageItem>) items.clone();
-                        items.remove(items.size() - 1);
-                        PreviewManager.startImageItemPreview((Activity) context, position, items);
+                        PreviewManager.startImageItemPreview((Activity) context, clickedPosition, items);
                     }
                 } else if (id == R.id.image_selected_layout_delete) {
                     int position = (Integer) view.getTag(R.id.image_selected_layout_delete);

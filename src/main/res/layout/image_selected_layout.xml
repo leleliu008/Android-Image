@@ -2,30 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/dp750_20"
     android:gravity="center">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="@dimen/dp750_190"
-        android:layout_height="@dimen/dp750_190">
+        android:layout_height="@dimen/dp750_190"
+        android:layout_margin="@dimen/dp750_20">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/image_selected_layout_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/dp750_14">
-            <ImageView
-                android:id="@+id/image_selected_layout_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"/>
-        </LinearLayout>
+            android:layout_margin="@dimen/dp750_14"
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:id="@+id/image_selected_layout_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|top"
-            android:scaleType="centerInside"
+            android:layout_width="@dimen/dp750_28"
+            android:layout_height="@dimen/dp750_28"
+            android:layout_alignParentRight="true"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_delete_image" />
-    </FrameLayout>
+    </RelativeLayout>
 </LinearLayout>
