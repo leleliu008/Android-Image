@@ -1,37 +1,38 @@
 package com.fpliu.newton.ui.image.preview;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.fpliu.newton.ui.base.BaseActivity;
-import com.fpliu.newton.ui.base.UIUtil;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.ViewPagerAdapter;
 import com.fpliu.newton.ui.image.view.TouchImageView;
 import com.fpliu.newton.ui.list.ViewHolder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnClickListener {
+public abstract class BasePreviewActivity<T> extends BaseActivity implements GestureDetector.OnDoubleTapListener {
 
-    static final String KEY_POSITION = "position";
+    protected static final String KEY_POSITION = "position";
 
-    static final String KEY_IMAGES = "images";
+    protected static final String KEY_IMAGES = "images";
 
     private int position;
 
     private ArrayList<T> images;
 
     private TextView textView;
-
-    private int screenHeight;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -46,21 +47,26 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            position = getIntent().getIntExtra(KEY_POSITION, 0);
-            images = (ArrayList<T>) getIntent().getSerializableExtra(KEY_IMAGES);
+            Intent intent = getIntent();
+            position = intent.getIntExtra(KEY_POSITION, 0);
+            Serializable serializable = intent.getSerializableExtra(KEY_IMAGES);
+            if (serializable != null) {
+                images = (ArrayList<T>)serializable;
+            }
         } else {
             position = savedInstanceState.getInt(KEY_POSITION);
-            images = (ArrayList<T>) savedInstanceState.getSerializable(KEY_IMAGES);
+            Serializable serializable = savedInstanceState.getSerializable(KEY_IMAGES);
+            if (serializable != null) {
+                images = (ArrayList<T>)serializable;
+            }
         }
-
-        screenHeight = UIUtil.getScreenHeight(this);
 
         ViewPager viewPager = new ViewPager(this);
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
-                BasePreviewActivity.this.position = position;
+                BasePreviewActivity.this.position = position % images().size();
                 updatePosition();
             }
         });
@@ -68,12 +74,9 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 ViewHolder viewHolder = ViewHolder.getInstance(R.layout.preview_view_item, convertView, parent);
-                TouchImageView touchImageView = viewHolder.id(R.id.preview_view_item_image_view)
-                        .image(getUri(position, getItem(position)), R.drawable.shape_black_bg)
-                        .tagWithCurrentId("TouchImageView")
-                        .clicked(BasePreviewActivity.this)
-                        .getView();
-                touchImageView.setMaxHeight(screenHeight);
+                viewHolder.id(R.id.preview_view_item_image_view).image(getUri(position, getItem(position)), R.drawable.shape_black_bg);
+                TouchImageView touchImageView = viewHolder.getView();
+                touchImageView.setOnDoubleTapListener(BasePreviewActivity.this);
                 return viewHolder.getItemView();
             }
         });
@@ -94,16 +97,19 @@ abstract class BasePreviewActivity<T> extends BaseActivity implements View.OnCli
     }
 
     @Override
-    public void onClick(View v) {
-        Object tag = v.getTag();
-        if (tag != null) {
-            if (tag instanceof String) {
-                String tagStr = (String) tag;
-                if ("TouchImageView".equals(tagStr)) {
-                    finish();
-                }
-            }
-        }
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        finish();
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
     }
 
     private void updatePosition() {

@@ -9,12 +9,16 @@
         android:layout_width="@dimen/dp750_190"
         android:layout_height="@dimen/dp750_190">
 
-        <ImageView
-            android:id="@+id/image_selected_layout_image"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/dp750_30"
-            android:scaleType="centerCrop" />
+            android:layout_margin="@dimen/dp750_14">
+            <ImageView
+                android:id="@+id/image_selected_layout_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/image_selected_layout_delete"

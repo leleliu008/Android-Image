@@ -5,4 +5,7 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="aip_main">#fc22292c</color>
+    <color name="image_text_disabled">#999999</color>
+    <color name="image_text_enabled">#333333</color>
+    <color name="image_divider">#dddddd</color>
 </resources>

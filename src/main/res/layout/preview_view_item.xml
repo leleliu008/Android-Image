@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fpliu.newton.ui.image.view.TouchImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/preview_view_item_image_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:gravity="center">
-
-    <com.fpliu.newton.ui.image.view.TouchImageView
-        android:id="@+id/preview_view_item_image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:clickable="true"
-        android:scaleType="fitXY" />
-</LinearLayout>
+    android:scaleType="fitCenter" />

@@ -14,7 +14,7 @@ import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.preview.PreviewManager;
 import com.fpliu.newton.ui.recyclerview.ItemAdapter;
-import com.fpliu.newton.ui.recyclerview.ItemViewHolder;
+import com.fpliu.newton.ui.recyclerview.holder.ItemViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class ImagePickLayout extends RecyclerView {
 
     private int deleteThumbnailRes = R.drawable.ic_delete_image;
 
-    private int defaultThumbnailRes = R.drawable.default_img;
+    private int defaultThumbnailRes = R.drawable.image_default;
 
     private ImageView.ScaleType thumbnailScaleType = ImageView.ScaleType.CENTER_CROP;
 
@@ -140,7 +140,7 @@ public class ImagePickLayout extends RecyclerView {
                     ImageItem imageItem = getItem(position);
                     //如果是添加图片按钮
                     if (imageItem == null) {
-                        ImagePicker.getInstance().needShowCamera(needShowCamera).needCrop(needCrop).cropWidth(cropWidth).cropHeight(cropHeight).selectMode(selectMode).maxSelectCount(maxSelectCount).onImagePickComplete(items -> {
+                        ImagePicker.getInstance().needShowCamera(needShowCamera).needCrop(needCrop).cropWidth(cropWidth).cropHeight(cropHeight).selectMode(selectMode).maxSelectCount(maxSelectCount).imagePickCompleteListener(items -> {
                             removeLastItem();
                             for (ImageItem image : items) {
                                 if (size() < maxSelectCount) {

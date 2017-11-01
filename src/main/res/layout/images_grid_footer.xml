@@ -1,24 +1,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/footer_panel"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:background="@color/aip_main">
+    android:layout_height="@dimen/dp750_88"
+    android:background="@color/white">
 
-    <Button
-        android:id="@+id/footer_panel_dir_btn"
+    <TextView
+        android:id="@+id/footer_panel_image_set_btn"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:background="@null"
+        android:layout_marginLeft="@dimen/dp750_20"
+        android:layout_marginRight="@dimen/dp750_20"
         android:drawablePadding="4dp"
         android:drawableRight="@drawable/text_indicator"
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:maxLines="1"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:singleLine="true"
         android:text="@string/all_images"
-        android:textColor="#ffffff"
-        android:textSize="16sp" />
+        android:textColor="@color/image_text_disabled"
+        android:textSize="@dimen/sp750_32" />
+
+    <TextView
+        android:id="@+id/footer_panel_preview_picked_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/dp750_20"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="@string/preview"
+        android:textColor="@color/color_selector"
+        android:textSize="@dimen/sp750_32" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp750_1"
+        android:background="@color/image_divider"/>
 </RelativeLayout>

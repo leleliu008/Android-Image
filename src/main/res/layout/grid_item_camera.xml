@@ -4,23 +4,10 @@
     android:layout_height="match_parent"
     android:padding="@dimen/dp750_3">
 
-    <RelativeLayout
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/sel_grid_camera_bg">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:drawablePadding="6dp"
-            android:drawableTop="@drawable/ic_camera"
-            android:gravity="center"
-            android:text="@string/take_picture"
-            android:textColor="#CDCECE"
-            android:textSize="14sp" />
-
-    </RelativeLayout>
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_camera" />
 
 </com.fpliu.newton.ui.image.view.SquareLayout>

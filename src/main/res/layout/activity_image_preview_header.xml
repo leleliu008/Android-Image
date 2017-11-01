@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dp750_60"
+    android:background="#A0000000">
+
+    <ImageView
+        android:id="@+id/activity_image_preview_header_back_btn"
+        android:layout_width="@dimen/dp750_60"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_back" />
+
+    <TextView
+        android:id="@+id/activity_image_preview_header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/sp750_28" />
+
+    <CheckBox
+        android:id="@+id/activity_image_preview_header_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/sp750_20"
+        android:button="@null"
+        android:clickable="true"
+        android:drawablePadding="0px"
+        android:layout_centerVertical="true"
+        android:drawableRight="@drawable/sel_media_item_checked" />
+
+</RelativeLayout>

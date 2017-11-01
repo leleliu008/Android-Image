@@ -1,5 +1,7 @@
 package com.fpliu.newton.ui.image.crop;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -11,9 +13,9 @@ import android.widget.FrameLayout;
 
 import com.fpliu.newton.ui.base.BaseActivity;
 import com.fpliu.newton.ui.base.UIUtil;
-import com.fpliu.newton.ui.image.picker.ImagePicker;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.Util;
+import com.fpliu.newton.ui.image.loader.ImageLoaderManager;
 import com.fpliu.newton.ui.image.view.AvatarRectView;
 import com.fpliu.newton.ui.image.view.SuperImageView;
 
@@ -23,26 +25,43 @@ import java.io.File;
 /**
  * 裁剪头像界面
  */
-public class CropActivity extends BaseActivity implements View.OnClickListener {
+public class ImageCropActivity extends BaseActivity implements View.OnClickListener {
+
+    private static final String KEY_IMAGE_PATH = "imagePath";
+
+    private static final String KEY_CROP_WIDTH = "cropWidth";
+
+    private static ImageCropCompleteListener imageCropCompleteListener;
 
     private SuperImageView superImageView;
     private AvatarRectView mRectView;
 
     private String imagePath;
 
+    private int cropWidth;
+
+    public static void startForResult(int requestCode, Activity activity, String imagePath, int cropWidth, ImageCropCompleteListener imageCropCompleteListener) {
+        ImageCropActivity.imageCropCompleteListener = imageCropCompleteListener;
+        Intent intent = new Intent(activity, ImageCropActivity.class);
+        intent.putExtra(KEY_IMAGE_PATH, imagePath);
+        intent.putExtra(KEY_CROP_WIDTH, cropWidth);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(ImagePicker.KEY_PIC_PATH, imagePath);
+        outState.putString(KEY_IMAGE_PATH, imagePath);
+        outState.putInt(KEY_CROP_WIDTH, cropWidth);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addViewInBody(R.layout.activity_crop);
-
         setTitle("裁剪");
+
+        addViewInBody(R.layout.activity_crop);
 
         FrameLayout rootView = (FrameLayout) findViewById(R.id.container);
         mRectView = new AvatarRectView(me(), UIUtil.getScreenWidth(me()) - 30 * 2);
@@ -55,19 +74,25 @@ public class CropActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_pic_rechoose).setOnClickListener(this);
 
         if (savedInstanceState == null) {
-            imagePath = getIntent().getStringExtra(ImagePicker.KEY_PIC_PATH);
+            Intent intent = getIntent();
+            imagePath = intent.getStringExtra(KEY_IMAGE_PATH);
+            cropWidth = intent.getIntExtra(KEY_CROP_WIDTH, 256);
         } else {
-            imagePath = savedInstanceState.getString(ImagePicker.KEY_PIC_PATH);
+            imagePath = savedInstanceState.getString(KEY_IMAGE_PATH);
+            cropWidth = savedInstanceState.getInt(KEY_CROP_WIDTH, 256);
         }
-        ImagePicker.getImageLoader().displayImage(superImageView, Uri.fromFile(new File(imagePath)).toString(), R.drawable.default_img);
+        ImageLoaderManager.getImageLoader().displayImage(superImageView, Uri.fromFile(new File(imagePath)).toString(), R.drawable.image_default);
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_pic_ok) {
-            Bitmap bmp = getCropBitmap(ImagePicker.getInstance().cropWidth());
+            Bitmap bitmap = getCropBitmap(cropWidth);
+            if (imageCropCompleteListener != null) {
+                imageCropCompleteListener.onImageCropComplete(bitmap, imagePath);
+                imageCropCompleteListener = null;
+            }
             finish();
-            ImagePicker.getInstance().notifyImageCropComplete(bmp, 0);
         } else if (v.getId() == R.id.btn_pic_rechoose) {
             finish();
         }
