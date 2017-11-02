@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import com.fpliu.newton.ui.image.R;
 import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.preview.PreviewManager;
-import com.fpliu.newton.ui.recyclerview.ItemAdapter;
+import com.fpliu.newton.ui.recyclerview.adapter.ItemAdapter;
 import com.fpliu.newton.ui.recyclerview.holder.ItemViewHolder;
 
 import java.util.ArrayList;
