@@ -302,7 +302,11 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
         } else {
             boolean isSelected = imagePicker.isPicked(imageItem);
             holder.id(R.id.iv_thumb).selected(isSelected).image(Uri.fromFile(new File(imageItem.path)).toString(), R.drawable.image_default);
-            holder.id(R.id.iv_thumb_check).tagWithCurrentId(position).checked(isSelected).checkedChange(this).visibility(imagePicker.isMultiMode() ? View.VISIBLE : View.GONE);
+            if (imagePicker.isMultiMode()) {
+                holder.id(R.id.iv_thumb_check).visibility(View.VISIBLE).tagWithCurrentId(position).checked(isSelected).checkedChange(this);
+            } else {
+                holder.id(R.id.iv_thumb_check).visibility(View.GONE);
+            }
         }
     }
 
