@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -178,9 +179,11 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
     }
 
     @Override
-    protected void onDestroy() {
-        imagePicker.reset();
-        super.onDestroy();
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            imagePicker.reset();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
