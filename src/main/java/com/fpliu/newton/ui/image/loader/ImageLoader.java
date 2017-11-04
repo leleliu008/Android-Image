@@ -51,6 +51,15 @@ public interface ImageLoader {
     void displayImage(Context context, ImageView imageView, int resId);
 
     /**
+     * 显示图片 - 原形
+     *
+     * @param resId     drawable资源ID
+     * @param imageView 显示的控件
+     */
+    void displayImage(ImageView imageView, int resId);
+
+
+    /**
      * 显示图片 - 圆形
      *
      * @param context    上下文
@@ -85,6 +94,23 @@ public interface ImageLoader {
      * @param imageView 显示的控件
      */
     void displayCircleImage(ImageView imageView, String resource);
+
+    /**
+     * 显示图片 - 圆形
+     *
+     * @param context   上下文
+     * @param resId     drawable资源ID
+     * @param imageView 显示的控件
+     */
+    void displayCircleImage(Context context, ImageView imageView, int resId);
+
+    /**
+     * 显示图片 - 圆形
+     *
+     * @param resId     drawable资源ID
+     * @param imageView 显示的控件
+     */
+    void displayCircleImage(ImageView imageView, int resId);
 
     /**
      * 显示图片 - 圆角矩形
@@ -125,4 +151,23 @@ public interface ImageLoader {
      * @param radius    弧度
      */
     void displayRoundImage(ImageView imageView, String resource, int radius);
+
+    /**
+     * 显示图片 - 圆角矩形
+     *
+     * @param context   上下文
+     * @param resId     drawable资源ID
+     * @param imageView 显示的控件
+     * @param radius    弧度
+     */
+    void displayRoundImage(Context context, ImageView imageView, int resId, int radius);
+
+    /**
+     * 显示图片 - 圆角矩形
+     *
+     * @param resId     drawable资源ID
+     * @param imageView 显示的控件
+     * @param radius    弧度
+     */
+    void displayRoundImage(ImageView imageView, int resId, int radius);
 }

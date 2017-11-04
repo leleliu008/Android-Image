@@ -35,6 +35,11 @@ public class DefaultImageLoader implements ImageLoader {
     }
 
     @Override
+    public void displayImage(ImageView imageView, int resId) {
+        imageView.setImageResource(resId);
+    }
+
+    @Override
     public void displayCircleImage(Context context, ImageView imageView, String resource, int defaultImg) {
         imageView.setImageURI(Uri.parse(resource));
     }
@@ -55,6 +60,16 @@ public class DefaultImageLoader implements ImageLoader {
     }
 
     @Override
+    public void displayCircleImage(Context context, ImageView imageView, int resId) {
+        imageView.setImageResource(resId);
+    }
+
+    @Override
+    public void displayCircleImage(ImageView imageView, int resId) {
+        imageView.setImageResource(resId);
+    }
+
+    @Override
     public void displayRoundImage(Context context, ImageView imageView, String resource, int defaultImg, int radius) {
         imageView.setImageURI(Uri.parse(resource));
     }
@@ -72,5 +87,15 @@ public class DefaultImageLoader implements ImageLoader {
     @Override
     public void displayRoundImage(ImageView imageView, String resource, int radius) {
         imageView.setImageURI(Uri.parse(resource));
+    }
+
+    @Override
+    public void displayRoundImage(Context context, ImageView imageView, int resId, int radius) {
+        imageView.setImageResource(resId);
+    }
+
+    @Override
+    public void displayRoundImage(ImageView imageView, int resId, int radius) {
+        imageView.setImageResource(resId);
     }
 }

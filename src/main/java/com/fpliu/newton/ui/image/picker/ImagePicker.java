@@ -18,6 +18,7 @@ public final class ImagePicker {
      * 单选模式
      */
     static final int SELECT_MODE_SINGLE = 0;
+
     /**
      * 多选模式
      */

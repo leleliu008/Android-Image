@@ -286,8 +286,8 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
     }
 
     @Override
-    public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-        if (position == 0) {
+    public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        if (viewType == ITEM_TYPE_CAMERA) {
             return ItemViewHolder.newInstance(R.layout.grid_item_camera, viewGroup);
         } else {
             return ItemViewHolder.newInstance(R.layout.image_grid_item, viewGroup);
