@@ -353,6 +353,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                 imagePicker.addInPickedCache(item);
                 updateStatus();
             } else {
+                buttonView.setChecked(false);
                 String text = getResources().getString(R.string.you_have_a_select_limit, imagePicker.maxSelectCount());
                 showToast(text);
             }
