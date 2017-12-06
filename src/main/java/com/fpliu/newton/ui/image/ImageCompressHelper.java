@@ -30,9 +30,9 @@ public final class ImageCompressHelper {
     private float maxWidth = 720.0f;
 
     /**
-     * 最大高度,默认为960
+     * 最大高度,默认为1280 大多数手机屏幕的宽/高是9:16，且以720x1280居多
      */
-    private float maxHeight = 960.0f;
+    private float maxHeight = 1280.0f;
 
 
     /**

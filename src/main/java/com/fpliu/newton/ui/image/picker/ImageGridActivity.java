@@ -149,21 +149,22 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
     public void onRefreshOrLoadMore(PullableViewContainer<RecyclerView> pullableViewContainer, PullType pullType, int pageNumber, int pageSize) {
         imagePicker.dataSource().loadData(me(), new LoadDataSourceListener() {
             @Override
-            public boolean onLoading(String imagePath) {
+            public boolean filter(String imagePath) {
                 List<String> filters = imagePicker.dataSourceFilters();
-                boolean use = true;
+
                 if (filters != null && !filters.isEmpty()) {
                     if (imagePath.startsWith("/storage/emulated/0")) {
                         imagePath = imagePath.replace("/storage/emulated/0", "/sdcard");
                     }
                     for (String filterFilePath : filters) {
                         if (imagePath.startsWith(filterFilePath)) {
-                            use = false;
-                            break;
+                            Logger.d(TAG, imagePath + " is filtered!");
+                            return false;
                         }
                     }
                 }
-                return use;
+
+                return true;
             }
 
             @Override

@@ -210,7 +210,7 @@ public final class ImagePicker {
         return this;
     }
 
-    public ImagePicker localDataSourceFilters(List<String> filters) {
+    public ImagePicker dataSourceFilters(List<String> filters) {
         dataSourceFilters = filters;
         return this;
     }

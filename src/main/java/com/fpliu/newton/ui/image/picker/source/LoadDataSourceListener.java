@@ -7,11 +7,10 @@ import java.util.List;
 public interface LoadDataSourceListener {
 
     /**
-     *
-     * @param path
+     * @param item
      * @return true表示使用该结果，false表示过滤掉该结果
      */
-    boolean onLoading(String path);
+    boolean filter(String item);
 
     void onLoaded(List<ImageSet> imageSetList);
 }

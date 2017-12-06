@@ -74,7 +74,7 @@ public class LocalDataSource implements DataSource {
                             continue;
                         }
 
-                        if (!listener.onLoading(imagePath)) {
+                        if (!listener.filter(imagePath)) {
                             continue;
                         }
 
