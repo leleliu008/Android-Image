@@ -153,6 +153,9 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                 List<String> filters = imagePicker.dataSourceFilters();
                 boolean use = true;
                 if (filters != null && !filters.isEmpty()) {
+                    if (imagePath.startsWith("/storage/emulated/0")) {
+                        imagePath = imagePath.replace("/storage/emulated/0", "/sdcard");
+                    }
                     for (String filterFilePath : filters) {
                         if (imagePath.startsWith(filterFilePath)) {
                             use = false;

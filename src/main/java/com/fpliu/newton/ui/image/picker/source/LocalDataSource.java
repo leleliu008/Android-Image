@@ -68,6 +68,7 @@ public class LocalDataSource implements DataSource {
                     data.moveToFirst();
                     do {
                         String imagePath = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[0]));
+
                         //如果文件不存在，就忽略掉
                         if (!new File(imagePath).exists()) {
                             continue;
