@@ -31,7 +31,7 @@ public class LocalDataSource implements DataSource {
     public static final int LOADER_ALL = 0;
 
     @Override
-    public void loadData(final Context context, List<String> filters, final LoadDataSourceListener listener) {
+    public void loadData(final Context context, final LoadDataSourceListener listener) {
         if (context instanceof FragmentActivity) {
             ((FragmentActivity) context).getSupportLoaderManager().initLoader(LOADER_ALL, null, new LoaderManager.LoaderCallbacks<Cursor>() {
                 @Override
@@ -73,20 +73,9 @@ public class LocalDataSource implements DataSource {
                             continue;
                         }
 
-                        boolean needSkip = false;
-                        if (filters != null && !filters.isEmpty()) {
-                            for (String filterFilePath : filters) {
-                                if (imagePath.equals(filterFilePath)) {
-                                    needSkip = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (needSkip) {
+                        if (!listener.onLoading(imagePath)) {
                             continue;
                         }
-
-                        listener.onLoading(imagePath);
 
                         String imageName = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
                         long imageAddedTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));

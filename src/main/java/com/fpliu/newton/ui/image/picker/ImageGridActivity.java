@@ -147,10 +147,20 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
 
     @Override
     public void onRefreshOrLoadMore(PullableViewContainer<RecyclerView> pullableViewContainer, PullType pullType, int pageNumber, int pageSize) {
-        imagePicker.dataSource().loadData(me(), imagePicker.dataSourceFilters(), new LoadDataSourceListener() {
+        imagePicker.dataSource().loadData(me(), new LoadDataSourceListener() {
             @Override
-            public void onLoading(String path) {
-
+            public boolean onLoading(String imagePath) {
+                List<String> filters = imagePicker.dataSourceFilters();
+                boolean use = true;
+                if (filters != null && !filters.isEmpty()) {
+                    for (String filterFilePath : filters) {
+                        if (imagePath.startsWith(filterFilePath)) {
+                            use = false;
+                            break;
+                        }
+                    }
+                }
+                return use;
             }
 
             @Override

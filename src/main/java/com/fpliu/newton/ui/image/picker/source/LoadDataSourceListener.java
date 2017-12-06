@@ -6,7 +6,12 @@ import java.util.List;
 
 public interface LoadDataSourceListener {
 
-    void onLoading(String path);
+    /**
+     *
+     * @param path
+     * @return true表示使用该结果，false表示过滤掉该结果
+     */
+    boolean onLoading(String path);
 
     void onLoaded(List<ImageSet> imageSetList);
 }
