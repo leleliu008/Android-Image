@@ -4,9 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,7 +16,6 @@ import com.fpliu.newton.log.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -165,24 +162,56 @@ public final class ImageCompressHelper {
      */
     public File toFile(Context context, File sourceFile) {
         long length = sourceFile.length();
-        Logger.i(TAG, "sourceFileSize = " + (length / 1024) + "KB");
-        Logger.i(TAG, "maxFileSize = " + (maxFileSize / 1024) + "KB");
+        log("sourceFile", sourceFile, null);
+        log("maxFileSize", sourceFile, null);
 
         //如果文件本来就没有超过最大文件大小，就不用压缩了
         if (length <= maxFileSize) {
+            log("destFile", sourceFile, null);
             return sourceFile;
         }
+        //如果没有设置保存的文件夹，使用默认的目录
         if (TextUtils.isEmpty(destinationDir)) {
             destinationDir = Environment.getExternalStorageDirectory() + "/" + context.getPackageName() + "/image";
         }
+        //如果没有设置保存的文件的文件名前缀，设置默认为时间戳
         if (TextUtils.isEmpty(fileNamePrefix)) {
             fileNamePrefix = String.valueOf(System.currentTimeMillis());
         }
 
-        File resultFile = compressImage(context.getApplicationContext(), Uri.fromFile(sourceFile), maxWidth, maxHeight,
-                compressFormat, bitmapConfig, quality, destinationDir, "", fileNamePrefix, hide);
-        Logger.i(TAG, "compressedFileSize = " + (resultFile.length() / 1024) + "KB");
-        return resultFile;
+        Uri sourceUri = Uri.fromFile(sourceFile);
+        String destFileName = generateFilePath(context.getApplicationContext(), sourceUri, destinationDir, fileNamePrefix, splitFileName(getFileName(context, sourceUri))[0], compressFormat.name().toLowerCase(), hide);
+        File destFile = new File(destFileName);
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(destFile);
+            //缩放图片
+            Bitmap bitmap = getScaledBitmap(context, sourceUri, maxWidth, maxHeight, bitmapConfig);
+            if (bitmap == null) {
+                log("destFile", sourceFile, null);
+                return sourceFile;
+            }
+            //压缩成功
+            if (bitmap.compress(compressFormat, quality, out)) {
+                log("destFile", destFile, bitmap);
+                return destFile;
+            } else {
+                log("destFile", sourceFile, null);
+                return sourceFile;
+            }
+        } catch (Exception e) {
+            Logger.e(TAG, "", e);
+            log("destFile", sourceFile, null);
+            return sourceFile;
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                Logger.e(TAG, "", e);
+            }
+        }
     }
 
     /**
@@ -199,75 +228,53 @@ public final class ImageCompressHelper {
     }
 
     private static Bitmap getScaledBitmap(Context context, Uri imageUri, float maxWidth, float maxHeight, Bitmap.Config bitmapConfig) {
+        Logger.i(TAG, "getScaledBitmap() imageUri = " + imageUri + ", maxWidth = " + maxWidth + ", maxHeight = " + maxHeight + ", bitmapConfig = " + bitmapConfig);
+
         String filePath = getRealPathFromURI(context, imageUri);
-        Bitmap scaledBitmap = null;
+
+        int actualHeight = 0;
+        int actualWidth = 0;
+        int orientation = 0;
+
+        //尝试从EXIF中读取尺寸
+        try {
+            ExifInterface exifInterface = new ExifInterface(filePath);
+            //获取图片的高度
+            actualHeight = exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, ExifInterface.ORIENTATION_NORMAL);
+            //获取图片的宽度
+            actualWidth = exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, ExifInterface.ORIENTATION_NORMAL);
+            orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+            Logger.i(TAG, "ExifInterface: actualWidth = " + actualWidth + ", actualHeight = " + actualHeight + ", orientation = " + orientation);
+        } catch (IOException e) {
+            Logger.e(TAG, "", e);
+        }
 
         BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap bmp = null;
 
-        //by setting this field as true, the actual bitmap pixels are not loaded in the memory. Just the bounds are loaded. If
-        //you try the use the bitmap here, you will get null.
-        options.inJustDecodeBounds = true;
-        Bitmap bmp = BitmapFactory.decodeFile(filePath, options);
-        if (bmp == null) {
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(filePath);
-                BitmapFactory.decodeStream(inputStream, null, options);
-                inputStream.close();
-            } catch (FileNotFoundException exception) {
-                exception.printStackTrace();
-            } catch (IOException exception) {
-                exception.printStackTrace();
+        if (actualHeight <= 0 || actualWidth <= 0) {
+            //只解析尺寸数据，不加载真正的图像数据
+            options.inJustDecodeBounds = true;
+
+            bmp = BitmapFactory.decodeFile(filePath, options);
+
+            actualHeight = options.outHeight;
+            actualWidth = options.outWidth;
+            Logger.i(TAG, "actualWidth = options.outWidth = " + actualWidth + ", actualHeight = options.outHeight = " + actualHeight);
+
+            if (actualHeight <= 0 || actualWidth <= 0) {
+                if (bmp != null) {
+                    actualWidth = bmp.getWidth();
+                    actualHeight = bmp.getHeight();
+                    Logger.i(TAG, "actualWidth = bmp.getWidth() = " + actualWidth + ", actualHeight = bmp.getHeight() = " + actualHeight);
+                }
             }
         }
 
-        int actualHeight = options.outHeight;
-        int actualWidth = options.outWidth;
-
-        if (actualHeight == -1 || actualWidth == -1) {
-            try {
-                ExifInterface exifInterface = new ExifInterface(filePath);
-                actualHeight = exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, ExifInterface.ORIENTATION_NORMAL);//获取图片的高度
-                actualWidth = exifInterface.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, ExifInterface.ORIENTATION_NORMAL);//获取图片的宽度
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (actualWidth <= 0 || actualHeight <= 0) {
-            Bitmap bitmap2 = BitmapFactory.decodeFile(filePath);
-            if (bitmap2 != null) {
-                actualWidth = bitmap2.getWidth();
-                actualHeight = bitmap2.getHeight();
-            } else {
-                return null;
-            }
-        }
-
-        float imgRatio = (float) actualWidth / actualHeight;
-        float maxRatio = maxWidth / maxHeight;
-
-        //width and height values are set maintaining the aspect ratio of the image
-        if (actualHeight > maxHeight || actualWidth > maxWidth) {
-            if (imgRatio < maxRatio) {
-                imgRatio = maxHeight / actualHeight;
-                actualWidth = (int) (imgRatio * actualWidth);
-                actualHeight = (int) maxHeight;
-            } else if (imgRatio > maxRatio) {
-                imgRatio = maxWidth / actualWidth;
-                actualHeight = (int) (imgRatio * actualHeight);
-                actualWidth = (int) maxWidth;
-            } else {
-                actualHeight = (int) maxHeight;
-                actualWidth = (int) maxWidth;
-            }
-        }
-
-        //setting inSampleSize value allows to load a scaled down version of the original image
-        options.inSampleSize = calculateInSampleSize(options, actualWidth, actualHeight);
-
-        //inJustDecodeBounds set to false to load the actual bitmap
+        //加载真正的图像数据
         options.inJustDecodeBounds = false;
+        //缩放比率
+        options.inSampleSize = calculateInSampleSize(actualWidth, actualHeight, maxWidth, maxHeight);
 
         //this options allow android to claim the bitmap memory if it runs low on memory
         options.inPurgeable = true;
@@ -275,49 +282,37 @@ public final class ImageCompressHelper {
         options.inTempStorage = new byte[16 * 1024];
 
         try {
-            // load the bitmap getTempFile its path
             bmp = BitmapFactory.decodeFile(filePath, options);
             if (bmp == null) {
                 InputStream inputStream = null;
                 try {
                     inputStream = new FileInputStream(filePath);
                     bmp = BitmapFactory.decodeStream(inputStream, null, options);
-                    inputStream.close();
-                } catch (IOException exception) {
-                    exception.printStackTrace();
+                } catch (IOException e) {
+                    Logger.e(TAG, "", e);
+                } finally {
+                    if (inputStream != null) {
+                        try {
+                            inputStream.close();
+                        } catch (IOException e) {
+                            Logger.e(TAG, "", e);
+                        }
+                    }
                 }
             }
         } catch (OutOfMemoryError e) {
-            e.printStackTrace();
+            Logger.e(TAG, "", e);
         }
+
         if (bmp == null) {
             return null;
         }
-        if (actualHeight <= 0 || actualWidth <= 0) {
-            return null;
+        if (orientation == 0) {
+            Logger.i(TAG, "orientation == 0, bmp.getWidth() = " + bmp.getWidth() + ", bmp.getHeight() = " + bmp.getHeight());
+            return bmp;
         }
-
-        try {
-            scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, bitmapConfig);
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-        }
-
-        float ratioX = actualWidth / (float) options.outWidth;
-        float ratioY = actualHeight / (float) options.outHeight;
-
-        Matrix scaleMatrix = new Matrix();
-        scaleMatrix.setScale(ratioX, ratioY, 0, 0);
-
-        Canvas canvas = new Canvas(scaledBitmap);
-        canvas.setMatrix(scaleMatrix);
-        canvas.drawBitmap(bmp, 0, 0, new Paint(Paint.FILTER_BITMAP_FLAG));
-
-        //check the rotation of the image and display it properly
-        ExifInterface exif;
-        try {
-            exif = new ExifInterface(filePath);
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 0);
+        //如果图像角度不对，就对图像进行旋转
+        else {
             Matrix matrix = new Matrix();
             if (orientation == 6) {
                 matrix.postRotate(90);
@@ -326,83 +321,65 @@ public final class ImageCompressHelper {
             } else if (orientation == 8) {
                 matrix.postRotate(270);
             }
-            scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0,
-                    scaledBitmap.getWidth(), scaledBitmap.getHeight(),
-                    matrix, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return scaledBitmap;
-    }
-
-    private File compressImage(Context context, Uri imageUri, float maxWidth, float maxHeight,
-                              Bitmap.CompressFormat compressFormat, Bitmap.Config bitmapConfig,
-                              int quality, String parentPath, String prefix, String fileName, boolean hide) {
-        FileOutputStream out = null;
-        String filename = generateFilePath(context, parentPath, imageUri, compressFormat.name().toLowerCase(), prefix, fileName, hide);
-        try {
-            out = new FileOutputStream(filename);
-            //write the compressed bitmap at the destination specified by filename.
-            getScaledBitmap(context, imageUri, maxWidth, maxHeight, bitmapConfig).compress(compressFormat, quality, out);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignored) {
+            //对原图进行矩阵变换
+            Bitmap newBitmap = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+            if (newBitmap != bmp) {
+                bmp.recycle();
+                bmp = newBitmap;
             }
+            Logger.i(TAG, "orientation == " + orientation + ", bmp.getWidth() = " + bmp.getWidth() + ", bmp.getHeight()" + bmp.getHeight());
+            return bmp;
         }
-
-        return new File(filename);
     }
 
-    private static String generateFilePath(Context context, String parentPath, Uri uri,
-                                           String extension, String prefix, String fileName, boolean hide) {
-        File file = new File(parentPath);
-        if (!file.exists()) {
-            file.mkdirs();
+    private static String generateFilePath(Context context, Uri sourceUri, String destinationDir,
+                                           String fileNamePrefix, String fileName, String extension, boolean hide) {
+        File destDir = new File(destinationDir);
+        if (!destDir.exists()) {
+            destDir.mkdirs();
         }
-        /** if prefix is null, set prefix "" */
-        prefix = TextUtils.isEmpty(prefix) ? "" : prefix;
-        /** reset fileName by prefix and custom file name */
-        fileName = TextUtils.isEmpty(fileName) ? prefix + splitFileName(getFileName(context, uri))[0] : fileName;
-        String filePath = file.getAbsolutePath() + File.separator + fileName + "." + extension;
-        return hide ? filePath + ".xml" : fileName;
-    }
 
+        if (fileNamePrefix == null) {
+            fileNamePrefix = "";
+        }
+
+        if (fileName == null) {
+            fileName = "";
+        }
+
+        fileName = destDir.getAbsolutePath() + File.separator + fileNamePrefix + fileName + "." + extension;
+        return hide ? fileName + ".xml" : fileName;
+    }
 
     /**
      * 计算inSampleSize
      */
-    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        final int height = options.outHeight;
-        final int width = options.outWidth;
+    private static int calculateInSampleSize(int actualWidth, int actualHeight, float maxWidth, float maxHeight) {
         int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
-            final int heightRatio = Math.round((float) height / (float) reqHeight);
-            final int widthRatio = Math.round((float) width / (float) reqWidth);
-            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        if (actualWidth > maxWidth || actualHeight > maxHeight) {
+            int heightRatio = Math.round(actualHeight / maxHeight);
+            int widthRatio = Math.round(actualWidth / maxWidth);
+            Logger.i(TAG, "heightRatio = " + heightRatio + ", widthRatio = " + widthRatio);
+            inSampleSize = heightRatio > widthRatio ? heightRatio : widthRatio;
+            if (inSampleSize == 3) {
+                inSampleSize = 4;
+            } else if (inSampleSize > 4 && inSampleSize < 8) {
+                inSampleSize = 8;
+            }
         }
 
-        final float totalPixels = width * height;
-        final float totalReqPixelsCap = reqWidth * reqHeight * 2;
-
-        while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
-            inSampleSize++;
-        }
+        Logger.i(TAG, "inSampleSize = " + inSampleSize);
 
         return inSampleSize;
     }
 
     /**
      * 获取真实的路径
-     * @param context   上下文
-     * @param uri       uri
-     * @return          文件路径
+     *
+     * @param context 上下文
+     * @param uri     uri
+     * @return 文件路径
      */
     private static String getRealPathFromURI(Context context, Uri uri) {
         Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
@@ -419,7 +396,8 @@ public final class ImageCompressHelper {
 
     /**
      * 截取文件名称
-     * @param fileName  文件名称
+     *
+     * @param fileName 文件名称
      */
     private static String[] splitFileName(String fileName) {
         String name = fileName;
@@ -435,9 +413,10 @@ public final class ImageCompressHelper {
 
     /**
      * 获取文件名称
-     * @param context   上下文
-     * @param uri       uri
-     * @return          文件名称
+     *
+     * @param context 上下文
+     * @param uri     uri
+     * @return 文件名称
      */
     private static String getFileName(Context context, Uri uri) {
         String result = null;
@@ -448,7 +427,7 @@ public final class ImageCompressHelper {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.e(TAG, "", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -463,5 +442,13 @@ public final class ImageCompressHelper {
             }
         }
         return result;
+    }
+
+    private static void log(String tag, File file, Bitmap bitmap) {
+        if (bitmap == null) {
+            Logger.i(TAG, tag + ": path = " + file.getAbsolutePath() + ", size = " + (file.length() / 1024) + "KB");
+        } else {
+            Logger.i(TAG, tag + ": path = " + file.getAbsolutePath() + ", size = " + (file.length() / 1024) + "KB, width = " + bitmap.getWidth() + ", height = " + bitmap.getHeight());
+        }
     }
 }

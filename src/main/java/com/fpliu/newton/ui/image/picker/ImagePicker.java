@@ -10,6 +10,7 @@ import com.fpliu.newton.ui.image.picker.source.DataSource;
 import com.fpliu.newton.ui.image.picker.source.LocalDataSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class ImagePicker {
@@ -58,6 +59,11 @@ public final class ImagePicker {
      * 数据源
      */
     private DataSource dataSource = new LocalDataSource();
+
+    /**
+     * 数据源过滤器
+     */
+    private List<String> dataSourceFilters;
 
     /**
      * 选择完成的回掉
@@ -199,6 +205,20 @@ public final class ImagePicker {
         return dataSource;
     }
 
+    public ImagePicker dataSourceFilters(String... filters) {
+        dataSourceFilters = Arrays.asList(filters);
+        return this;
+    }
+
+    public ImagePicker localDataSourceFilters(List<String> filters) {
+        dataSourceFilters = filters;
+        return this;
+    }
+
+    public List<String> dataSourceFilters() {
+        return dataSourceFilters;
+    }
+
     public ImagePicker imageCropCompleteListener(ImageCropCompleteListener listener) {
         this.imageCropCompleteListener = listener;
         return this;
@@ -257,6 +277,7 @@ public final class ImagePicker {
         if (!(dataSource instanceof LocalDataSource)) {
             dataSource = new LocalDataSource();
         }
+        dataSourceFilters = null;
         imageCropCompleteListener = null;
         imagePickCompleteListener = null;
     }

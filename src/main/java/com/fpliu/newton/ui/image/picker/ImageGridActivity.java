@@ -30,6 +30,7 @@ import com.fpliu.newton.ui.image.bean.ImageItem;
 import com.fpliu.newton.ui.image.bean.ImageSet;
 import com.fpliu.newton.ui.image.crop.ImageCropActivity;
 import com.fpliu.newton.ui.image.loader.ImageLoaderManager;
+import com.fpliu.newton.ui.image.picker.source.LoadDataSourceListener;
 import com.fpliu.newton.ui.list.ItemAdapter;
 import com.fpliu.newton.ui.list.PullableRecyclerViewActivity;
 import com.fpliu.newton.ui.list.ViewHolder;
@@ -90,7 +91,6 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
         super.onCreate(savedInstanceState);
 
         setTitle("图片");
-        getContentView().setHeadBackgroundColor(Color.parseColor("#42caf4"));
         getPullableViewContainer().getPullableView().setBackgroundColor(Color.WHITE);
 
         asGrid(3);
@@ -147,33 +147,41 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
 
     @Override
     public void onRefreshOrLoadMore(PullableViewContainer<RecyclerView> pullableViewContainer, PullType pullType, int pageNumber, int pageSize) {
-        imagePicker.dataSource().loadData(me(), imageSetList -> {
-            //说明没有图片
-            if (imageSetList == null) {
-                if (imagePicker.needShowCamera()) {
-                    List<ImageItem> imageItems = new ArrayList<>();
-                    imageItems.add(null);
-                    setItems(imageItems);
+        imagePicker.dataSource().loadData(me(), imagePicker.dataSourceFilters(), new LoadDataSourceListener() {
+            @Override
+            public void onLoading(String path) {
+
+            }
+
+            @Override
+            public void onLoaded(List<ImageSet> imageSetList) {
+                //说明没有图片
+                if (imageSetList == null) {
+                    if (imagePicker.needShowCamera()) {
+                        List<ImageItem> imageItems = new ArrayList<>();
+                        imageItems.add(null);
+                        setItems(imageItems);
+                    } else {
+                        pullableViewContainer.finishRequest(pullType, true, "没有图片");
+                    }
                 } else {
-                    pullableViewContainer.finishRequest(pullType, true, "没有图片");
-                }
-            } else {
-                imagePicker.setImageSets(imageSetList);
+                    imagePicker.setImageSets(imageSetList);
 
-                ImageSet imageSet = imageSetList.get(0);
-                List<ImageItem> imageItems = imageSet.imageItems;
-                if (imagePicker.needShowCamera()) {
-                    imageItems = new ArrayList<>();
-                    imageItems.add(null);
-                    imageItems.addAll(imageSet.imageItems);
-                }
-                setItems(imageItems);
+                    ImageSet imageSet = imageSetList.get(0);
+                    List<ImageItem> imageItems = imageSet.imageItems;
+                    if (imagePicker.needShowCamera()) {
+                        imageItems = new ArrayList<>();
+                        imageItems.add(null);
+                        imageItems.addAll(imageSet.imageItems);
+                    }
+                    setItems(imageItems);
 
-                if (mFolderPopupWindow == null) {
-                    createPopupFolderList(me());
+                    if (mFolderPopupWindow == null) {
+                        createPopupFolderList(me());
+                    }
+                    imageSetBtn.setText(imageSet.name);
+                    itemAdapter.setItems(imageSetList);
                 }
-                imageSetBtn.setText(imageSet.name);
-                itemAdapter.setItems(imageSetList);
             }
         });
     }
@@ -266,7 +274,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                 ViewHolder viewHolder = ViewHolder.getInstance(R.layout.list_item_folder, convertView, parent);
                 ImageLoaderManager.getImageLoader().displayImage(viewHolder.id(R.id.cover).getImageView(), Uri.fromFile(new File(item.cover.path)).toString(), R.drawable.image_default);
                 viewHolder.id(R.id.name).text(item.name);
-                viewHolder.id(R.id.size).text(item.imageItems.size() + me().getResources().getString(R.string.piece));
+                viewHolder.id(R.id.size).text(item.imageItems.size() + me().getResources().getString(R.string.ai_piece));
                 viewHolder.id(R.id.indicator).visibility(selectedImageSetIndex == position ? View.VISIBLE : View.INVISIBLE);
                 return viewHolder.getItemView();
             }
@@ -354,7 +362,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                 updateStatus();
             } else {
                 buttonView.setChecked(false);
-                String text = getResources().getString(R.string.you_have_a_select_limit, imagePicker.maxSelectCount());
+                String text = getResources().getString(R.string.ai_you_have_a_select_limit, imagePicker.maxSelectCount());
                 showToast(text);
             }
         } else {

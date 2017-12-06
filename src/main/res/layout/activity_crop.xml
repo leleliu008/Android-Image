@@ -28,7 +28,7 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/divider"
             android:gravity="center"
-            android:text="@string/reSelect"
+            android:text="@string/ai_reSelect"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -47,7 +47,7 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/divider"
             android:gravity="center"
-            android:text="@string/ok"
+            android:text="@string/ai_ok"
             android:textColor="@color/white"
             android:textSize="18sp" />
 

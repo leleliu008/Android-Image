@@ -31,7 +31,7 @@ public class LocalDataSource implements DataSource {
     public static final int LOADER_ALL = 0;
 
     @Override
-    public void loadData(final Context context, final ImagesLoadedListener listener) {
+    public void loadData(final Context context, List<String> filters, final LoadDataSourceListener listener) {
         if (context instanceof FragmentActivity) {
             ((FragmentActivity) context).getSupportLoaderManager().initLoader(LOADER_ALL, null, new LoaderManager.LoaderCallbacks<Cursor>() {
                 @Override
@@ -52,13 +52,13 @@ public class LocalDataSource implements DataSource {
                 public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
                     Logger.d(TAG, "onLoadFinished()");
                     if (data == null) {
-                        listener.onImagesLoaded(null);
+                        listener.onLoaded(null);
                         return;
                     }
 
                     int count = data.getCount();
                     if (count <= 0) {
-                        listener.onImagesLoaded(null);
+                        listener.onLoaded(null);
                         return;
                     }
 
@@ -72,6 +72,21 @@ public class LocalDataSource implements DataSource {
                         if (!new File(imagePath).exists()) {
                             continue;
                         }
+
+                        boolean needSkip = false;
+                        if (filters != null && !filters.isEmpty()) {
+                            for (String filterFilePath : filters) {
+                                if (imagePath.equals(filterFilePath)) {
+                                    needSkip = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (needSkip) {
+                            continue;
+                        }
+
+                        listener.onLoading(imagePath);
 
                         String imageName = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
                         long imageAddedTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));
@@ -98,7 +113,7 @@ public class LocalDataSource implements DataSource {
                     } while (data.moveToNext());
 
                     ImageSet imageSetAll = new ImageSet();
-                    imageSetAll.name = context.getResources().getString(R.string.all_images);
+                    imageSetAll.name = context.getResources().getString(R.string.ai_all_images);
                     imageSetAll.cover = imageItems.get(0);
                     imageSetAll.imageItems = imageItems;
                     imageSetAll.path = "/";
@@ -108,7 +123,7 @@ public class LocalDataSource implements DataSource {
                     }
                     imageSetList.add(0, imageSetAll);
 
-                    listener.onImagesLoaded(imageSetList);
+                    listener.onLoaded(imageSetList);
                 }
 
                 @Override
