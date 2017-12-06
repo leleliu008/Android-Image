@@ -66,11 +66,6 @@ public final class ImageCompressHelper {
     private String fileNamePrefix;
 
     /**
-     * 是否要隐藏（不让图库等软件读取到，实现方法是把后缀名设置为.xml）
-     */
-    private boolean hide = true;
-
-    /**
      * 设置图片最大宽度
      *
      * @param maxWidth 最大宽度
@@ -148,13 +143,6 @@ public final class ImageCompressHelper {
     }
 
     /**
-     * 不要隐藏文件。默认是隐藏文件
-     */
-    public void dontHide() {
-        this.hide = false;
-    }
-
-    /**
      * 压缩成文件
      *
      * @param sourceFile 原始文件
@@ -180,7 +168,7 @@ public final class ImageCompressHelper {
         }
 
         Uri sourceUri = Uri.fromFile(sourceFile);
-        String destFileName = generateFilePath(context.getApplicationContext(), sourceUri, destinationDir, fileNamePrefix, splitFileName(getFileName(context, sourceUri))[0], compressFormat.name().toLowerCase(), hide);
+        String destFileName = generateFilePath(context.getApplicationContext(), sourceUri, destinationDir, fileNamePrefix, splitFileName(getFileName(context, sourceUri))[0], compressFormat.name().toLowerCase());
         File destFile = new File(destFileName);
         FileOutputStream out = null;
         try {
@@ -333,7 +321,7 @@ public final class ImageCompressHelper {
     }
 
     private static String generateFilePath(Context context, Uri sourceUri, String destinationDir,
-                                           String fileNamePrefix, String fileName, String extension, boolean hide) {
+                                           String fileNamePrefix, String fileName, String extension) {
         File destDir = new File(destinationDir);
         if (!destDir.exists()) {
             destDir.mkdirs();
@@ -347,8 +335,7 @@ public final class ImageCompressHelper {
             fileName = "";
         }
 
-        fileName = destDir.getAbsolutePath() + File.separator + fileNamePrefix + fileName + "." + extension;
-        return hide ? fileName + ".xml" : fileName;
+        return destDir.getAbsolutePath() + File.separator + fileNamePrefix + fileName + "." + extension;
     }
 
     /**
