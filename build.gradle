@@ -58,7 +58,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.fpliu:Android-BaseUI:1.0.0'
     compile 'com.fpliu:Android-CustomDimen:1.0.0'
+    compile 'com.fpliu:Android-CustomDrawable:1.0.0'
+    compile 'com.fpliu:Android-RecyclerViewHelper:1.0.0'
     compile 'com.fpliu:Android-List:1.0.0'
+    compile 'com.fpliu:Android-Pullable:1.0.0'
 }
 
 
