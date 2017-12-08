@@ -98,10 +98,11 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
         canPullDown(false);
         canPullUp(false);
 
+        footerView = View.inflate(this, R.layout.images_grid_footer, null);
+        footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)getResources().getDimension(R.dimen.dp750_88)));
         //添加Footer
-        setViewAfterBody(R.layout.images_grid_footer);
-        footerView = findViewById(R.id.footer_panel);
-        imageSetBtn = (TextView) findViewById(R.id.footer_panel_image_set_btn);
+        setViewAfterBody(footerView);
+        imageSetBtn = findViewById(R.id.footer_panel_image_set_btn);
         click(imageSetBtn).subscribe(view -> {
             if (mFolderPopupWindow.isShowing()) {
                 backgroundAlpha(1f);
