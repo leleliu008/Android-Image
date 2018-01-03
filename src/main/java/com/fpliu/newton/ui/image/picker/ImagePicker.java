@@ -238,6 +238,16 @@ public final class ImagePicker {
     }
 
     public ImagePicker pick(Activity activity) {
+        if (dataSource instanceof LocalDataSource) {
+            String packageName = activity.getPackageName();
+            String filter1 = "/sdcard/" + packageName;
+            String filter2 = "/storage/emulated/0/" + packageName;
+            if (dataSourceFilters == null) {
+                dataSourceFilters = new ArrayList<>();
+            }
+            dataSourceFilters.add(filter1);
+            dataSourceFilters.add(filter2);
+        }
         activity.startActivity(new Intent(activity, ImageGridActivity.class));
         return this;
     }
