@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -18,8 +17,6 @@ import com.fpliu.newton.ui.image.Util;
 import com.fpliu.newton.ui.image.loader.ImageLoaderManager;
 import com.fpliu.newton.ui.image.view.AvatarRectView;
 import com.fpliu.newton.ui.image.view.SuperImageView;
-
-import java.io.File;
 
 
 /**
@@ -81,7 +78,7 @@ public class ImageCropActivity extends BaseActivity implements View.OnClickListe
             imagePath = savedInstanceState.getString(KEY_IMAGE_PATH);
             cropWidth = savedInstanceState.getInt(KEY_CROP_WIDTH, 256);
         }
-        ImageLoaderManager.getImageLoader().displayImage(superImageView, Uri.fromFile(new File(imagePath)).toString(), R.drawable.image_default);
+        ImageLoaderManager.getImageLoader().displayImage(superImageView, imagePath, R.drawable.image_default);
     }
 
     @Override

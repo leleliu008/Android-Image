@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -99,7 +98,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
         canPullUp(false);
 
         footerView = View.inflate(this, R.layout.images_grid_footer, null);
-        footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int)getResources().getDimension(R.dimen.dp750_88)));
+        footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen.dp750_88)));
         //添加Footer
         setViewAfterBody(footerView);
         imageSetBtn = findViewById(R.id.footer_panel_image_set_btn);
@@ -173,6 +172,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                         List<ImageItem> imageItems = new ArrayList<>();
                         imageItems.add(null);
                         setItems(imageItems);
+                        pullableViewContainer.finishRequestSuccess(pullType);
                     } else {
                         pullableViewContainer.finishRequest(pullType, true, "没有图片");
                     }
@@ -193,6 +193,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                     }
                     imageSetBtn.setText(imageSet.name);
                     itemAdapter.setItems(imageSetList);
+                    pullableViewContainer.finishRequestSuccess(pullType);
                 }
             }
         });
@@ -284,7 +285,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
             public View getView(int position, View convertView, ViewGroup parent) {
                 ImageSet item = getItem(position);
                 ViewHolder viewHolder = ViewHolder.getInstance(R.layout.list_item_folder, convertView, parent);
-                ImageLoaderManager.getImageLoader().displayImage(viewHolder.id(R.id.cover).getImageView(), Uri.fromFile(new File(item.cover.path)).toString(), R.drawable.image_default);
+                ImageLoaderManager.getImageLoader().displayImage(viewHolder.id(R.id.cover).getImageView(), item.cover.path, R.drawable.image_default);
                 viewHolder.id(R.id.name).text(item.name);
                 viewHolder.id(R.id.size).text(item.imageItems.size() + me().getResources().getString(R.string.ai_piece));
                 viewHolder.id(R.id.indicator).visibility(selectedImageSetIndex == position ? View.VISIBLE : View.INVISIBLE);
@@ -324,7 +325,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
 
         } else {
             boolean isSelected = imagePicker.isPicked(imageItem);
-            holder.id(R.id.iv_thumb).selected(isSelected).image(Uri.fromFile(new File(imageItem.path)).toString(), R.drawable.image_default);
+            holder.id(R.id.iv_thumb).selected(isSelected).image(imageItem.path, R.drawable.image_default);
             if (imagePicker.isMultiMode()) {
                 holder.id(R.id.iv_thumb_check).visibility(View.VISIBLE).tagWithCurrentId(position).checked(isSelected).checkedChange(this);
             } else {
