@@ -80,7 +80,7 @@ public class ImagePickLayout extends RecyclerView {
 
     private int radius = 8;
 
-    private ItemAdapter<ImageItem, ItemViewHolder> itemAdapter;
+    private ItemAdapter<ImageItem> itemAdapter;
 
     private OnImagesChangedListener onImagesChangedListener;
 
@@ -98,12 +98,16 @@ public class ImagePickLayout extends RecyclerView {
         ArrayList<ImageItem> imageItems = new ArrayList<>();
         imageItems.add(null);
         setLayoutManager(new GridLayoutManager(context, spanCount));
-        setAdapter(itemAdapter = new ItemAdapter<ImageItem, ItemViewHolder>(imageItems) {
+        setAdapter(itemAdapter = new ItemAdapter<ImageItem>(imageItems) {
 
             @Override
-            public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-                return ItemViewHolder
-                        .newInstance(R.layout.image_selected_layout, viewGroup)
+            public int onBindLayout(ViewGroup viewGroup, int viewType) {
+                return R.layout.image_selected_layout;
+            }
+
+            @Override
+            public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+                return super.onCreateViewHolder(viewGroup, viewType)
                         .id(R.id.image_selected_layout_delete)
                         .clicked(this)
                         .image(deleteThumbnailRes)
