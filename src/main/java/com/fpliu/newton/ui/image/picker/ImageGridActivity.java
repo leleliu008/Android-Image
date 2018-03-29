@@ -41,8 +41,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, ItemViewHolder>
-        implements CompoundButton.OnCheckedChangeListener {
+public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem>
+    implements CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = ImageGridActivity.class.getSimpleName();
 
@@ -114,7 +114,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
                 listView.setDivider(new ColorDrawable(getResources().getColor(R.color.divider)));
                 listView.setDividerHeight(1);
             }
-        });
+        }, throwable -> Logger.e(TAG, "", throwable));
         previewBtn = (TextView) findViewById(R.id.footer_panel_preview_picked_btn);
 
         //多选模式下，右边有一个"完成"按钮
@@ -142,7 +142,7 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
             previewBtn.setVisibility(View.GONE);
         }
 
-        onRefreshOrLoadMore(null, null, 0, 0);
+        onRefreshOrLoadMore(getPullableViewContainer(), PullType.DOWN, 0, 10);
     }
 
     @Override
@@ -310,11 +310,11 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem, I
     }
 
     @Override
-    public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public int onBindLayout(ViewGroup parent, int viewType) {
         if (viewType == ITEM_TYPE_CAMERA) {
-            return ItemViewHolder.newInstance(R.layout.grid_item_camera, viewGroup);
+            return R.layout.grid_item_camera;
         } else {
-            return ItemViewHolder.newInstance(R.layout.image_grid_item, viewGroup);
+            return R.layout.image_grid_item;
         }
     }
 
