@@ -11,13 +11,20 @@ public class ImageSet implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        try {
-            ImageSet other = (ImageSet) o;
-            return this.path.equalsIgnoreCase(other.path) && this.name.equalsIgnoreCase(other.name);
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        }
-        return super.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ImageSet imageSet = (ImageSet) o;
+
+        if (name != null ? !name.equals(imageSet.name) : imageSet.name != null) return false;
+        return path != null ? path.equals(imageSet.path) : imageSet.path == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        return result;
     }
 
     @Override

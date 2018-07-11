@@ -102,9 +102,14 @@ public class LocalDataSource implements DataSource {
                         }
                     } while (data.moveToNext());
 
+
                     ImageSet imageSetAll = new ImageSet();
                     imageSetAll.name = context.getResources().getString(R.string.ai_all_images);
-                    imageSetAll.cover = imageItems.get(0);
+                    if (imageItems.isEmpty()) {
+                        imageSetAll.cover = new ImageItem("", "", 0);
+                    } else {
+                        imageSetAll.cover = imageItems.get(0);
+                    }
                     imageSetAll.imageItems = imageItems;
                     imageSetAll.path = "/";
 

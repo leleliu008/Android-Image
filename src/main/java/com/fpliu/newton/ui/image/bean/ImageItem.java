@@ -17,13 +17,20 @@ public class ImageItem implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        try {
-            ImageItem other = (ImageItem) o;
-            return this.path.equalsIgnoreCase(other.path) && this.time == other.time;
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        }
-        return super.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ImageItem imageItem = (ImageItem) o;
+
+        if (time != imageItem.time) return false;
+        return path != null ? path.equals(imageItem.path) : imageItem.path == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = path != null ? path.hashCode() : 0;
+        result = 31 * result + (int) (time ^ (time >>> 32));
+        return result;
     }
 
     @Override
