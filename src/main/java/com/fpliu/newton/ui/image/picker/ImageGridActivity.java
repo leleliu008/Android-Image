@@ -17,10 +17,10 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.fpliu.newton.log.Logger;
+import com.fpliu.newton.ui.base.HeadBarLayout;
 import com.fpliu.newton.ui.base.TextBtn;
 import com.fpliu.newton.ui.base.UIUtil;
 import com.fpliu.newton.ui.image.R;
@@ -119,10 +119,11 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem>
 
         //多选模式下，右边有一个"完成"按钮
         if (imagePicker.isMultiMode()) {
-            getContentView().setRightViewStrategy(new TextBtn() {
+            HeadBarLayout headBarLayout = getContentView().getHeadBarLayout();
+            headBarLayout.setRightViewStrategy(new TextBtn() {
                 @Override
-                public Button onCreateView(RelativeLayout headView) {
-                    completeBtn = super.onCreateView(headView);
+                public Button onCreateView(Context context) {
+                    completeBtn = super.onCreateView(context);
                     completeBtn.setEnabled(false);
                     completeBtn.setText("完成");
                     completeBtn.setTextSize(20);
@@ -130,7 +131,8 @@ public class ImageGridActivity extends PullableRecyclerViewActivity<ImageItem>
                     completeBtn.setTextColor(getResources().getColorStateList(R.color.color_selector));
                     return completeBtn;
                 }
-            }).getRightBtnClickObservable().compose(bindToLifecycle()).subscribe(o -> {
+            });
+            headBarLayout.getRightBtnClickObservable().compose(bindToLifecycle()).subscribe(o -> {
                 imagePicker.notifyImagePickComplete();
                 finish();
             });

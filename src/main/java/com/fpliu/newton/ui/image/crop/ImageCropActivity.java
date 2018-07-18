@@ -58,14 +58,14 @@ public class ImageCropActivity extends BaseActivity implements View.OnClickListe
 
         setTitle("裁剪");
 
-        addViewInBody(R.layout.activity_crop);
+        addContentView(R.layout.activity_crop);
 
-        FrameLayout rootView = (FrameLayout) findViewById(R.id.container);
+        FrameLayout rootView = findViewById(R.id.container);
         mRectView = new AvatarRectView(me(), UIUtil.getScreenWidth(me()) - 30 * 2);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         rootView.addView(mRectView, 1, lp);
 
-        superImageView = (SuperImageView) findViewById(R.id.iv_pic);
+        superImageView = findViewById(R.id.iv_pic);
 
         findViewById(R.id.btn_pic_ok).setOnClickListener(this);
         findViewById(R.id.btn_pic_rechoose).setOnClickListener(this);
