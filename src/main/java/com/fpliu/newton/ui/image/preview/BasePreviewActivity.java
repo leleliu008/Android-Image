@@ -113,7 +113,7 @@ public abstract class BasePreviewActivity<T> extends BaseActivity implements Ges
     }
 
     private void updatePosition() {
-        if (textView != null) {
+        if (textView != null && images != null) {
             textView.setText((position + 1) + "/" + images.size());
         }
     }

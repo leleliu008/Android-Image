@@ -28,7 +28,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0.1"
     }
 
     sourceSets {
@@ -61,7 +61,7 @@ dependencies {
     compile 'com.fpliu:Android-CustomDimen:1.0.0'
     compile 'com.fpliu:Android-CustomDrawable:1.0.0'
     compile 'com.fpliu:Android-RecyclerViewHelper:1.0.0'
-    compile 'com.fpliu:Android-List:1.0.0'
+    compile 'com.fpliu:Android-List:1.0.1'
     compile 'com.fpliu:Android-Pullable:1.0.0'
 }
 
@@ -70,7 +70,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven' 
 //这个是版本号，必须填写
-version = "1.0.0"
+version = android.defaultConfig.versionName
 
 // 项目的主页,这个是说明，可随便填
 def siteUrl = 'https://github.com/leleliu008/Android-Image'
